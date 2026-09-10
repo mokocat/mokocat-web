@@ -27,22 +27,27 @@ const styles = {
     transition: 'all 0.2s',
     marginBottom: '-1px'
   }),
-  toolbar: {
+  // Desain Toolbar Baru (Sesuai Gambar)
+  toolbarWrapper: {
     display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '16px',
-    flexWrap: 'wrap',
-    gap: '12px'
+    flexDirection: 'column',
+    gap: '12px',
+    marginBottom: '20px'
+  },
+  infoText: {
+    fontSize: '13px',
+    color: '#64748b'
   },
   searchInput: {
-    padding: '8px 12px',
-    borderRadius: '6px',
-    border: '1px solid #cbd5e1',
-    fontSize: '13px',
+    padding: '12px 16px',
+    borderRadius: '8px',
+    background: '#3f3f46', // Warna gelap sesuai gambar
+    color: '#ffffff',
+    border: 'none',
+    fontSize: '14px',
     width: '100%',
-    maxWidth: '250px',
-    outline: 'none'
+    outline: 'none',
+    boxSizing: 'border-box'
   },
   tableWrapper: {
     borderRadius: '8px',
@@ -78,12 +83,12 @@ const styles = {
     background: isExpanded ? '#f8fafc' : '#ffffff',
     transition: 'background 0.2s',
   }),
-  // Desain Expand Area yang dikembalikan seperti semula (Anti terpotong)
+  // Area Expand kembali normal agar teks tidak terpotong
   expandedArea: {
     background: '#f8fafc',
     padding: '0 16px 16px 16px',
     borderBottom: '1px solid #e2e8f0',
-    whiteSpace: 'normal' // Mengizinkan teks turun ke bawah (wrap)
+    whiteSpace: 'normal'
   },
   detailsGrid: {
     display: 'grid',
@@ -120,41 +125,41 @@ const styles = {
   },
   iconRotate: (isExpanded) => ({
     display: 'inline-block',
-    transition: 'transform 0.3s ease',
+    transition: 'transform 0.2s',
     transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
     color: '#94a3b8',
     fontSize: '10px',
-    marginRight: '8px' // Memberi jarak antara panah dan angka nomor
+    marginRight: '8px' // Panah berdampingan dengan Nomor
   }),
-  // Desain Paginasi Baru
-  paginationWrapper: {
+  // Desain Paginasi Minimalis (Sesuai Gambar RDTC)
+  paginationContainer: {
     display: 'flex',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: '16px',
-    flexWrap: 'wrap',
-    gap: '12px'
+    gap: '16px',
+    marginTop: '20px'
   },
+  iconBtn: (disabled) => ({
+    background: 'transparent',
+    border: 'none',
+    color: disabled ? '#cbd5e1' : '#94a3b8',
+    cursor: disabled ? 'not-allowed' : 'pointer',
+    fontSize: '14px',
+    fontWeight: '600',
+    padding: '4px 8px'
+  }),
   pageSelect: {
-    padding: '6px 10px',
+    padding: '6px 16px',
     borderRadius: '6px',
     border: '1px solid #cbd5e1',
     background: '#ffffff',
-    fontSize: '13px',
-    outline: 'none',
+    fontSize: '14px',
+    color: '#0f172a',
     cursor: 'pointer',
-    marginLeft: '8px'
-  },
-  navBtn: (disabled) => ({
-    padding: '6px 12px',
-    borderRadius: '6px',
-    border: '1px solid #cbd5e1',
-    background: disabled ? '#f8fafc' : '#ffffff',
-    color: disabled ? '#94a3b8' : '#0f172a',
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    fontSize: '13px',
-    fontWeight: '600'
-  })
+    outline: 'none',
+    appearance: 'none', // Menghilangkan gaya bawaan browser jika memungkinkan
+    textAlign: 'center'
+  }
 };
 
 const getMerchantStyle = (merchant) => {
@@ -169,16 +174,14 @@ const getMerchantStyle = (merchant) => {
 export default function DataTablesCard({ dataFood, dataQris }) {
   const [activeTab, setActiveTab] = useState('food');
   const [searchTerm, setSearchTerm] = useState('');
-  const [expandedRow, setExpandedRow] = useState(null);
-  
-  // State Paginasi Baru
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10); 
+  const itemsPerPage = 10;
+  const [expandedRow, setExpandedRow] = useState(null);
 
   useEffect(() => {
     setCurrentPage(1);
     setExpandedRow(null);
-  }, [activeTab, searchTerm, itemsPerPage]);
+  }, [activeTab, searchTerm]);
 
   const toggleRow = (id) => {
     setExpandedRow(expandedRow === id ? null : id);
@@ -216,8 +219,9 @@ export default function DataTablesCard({ dataFood, dataQris }) {
         </button>
       </div>
 
-      <div style={styles.toolbar}>
-        <div style={{ fontSize: '13px', color: '#64748b' }}>
+      {/* STRUKTUR PENCARIAN BARU */}
+      <div style={styles.toolbarWrapper}>
+        <div style={styles.infoText}>
           Menampilkan <b>{paginatedData.length > 0 ? startNumber + 1 : 0} - {startNumber + paginatedData.length}</b> dari <b>{activeData.length}</b> data
         </div>
         <input 
@@ -255,7 +259,6 @@ export default function DataTablesCard({ dataFood, dataQris }) {
               
               return (
                 <React.Fragment key={item.id}>
-                  {/* BARIS UTAMA */}
                   <tr style={styles.trMain(isExpanded)} onClick={() => toggleRow(item.id)}>
                     <td style={styles.td('center')}>
                       <span style={styles.iconRotate(isExpanded)}>▼</span>
@@ -298,7 +301,6 @@ export default function DataTablesCard({ dataFood, dataQris }) {
                     )}
                   </tr>
 
-                  {/* BARIS EXPAND (DETAIL) */}
                   {isExpanded && (
                     <tr>
                       <td colSpan={activeTab === 'food' ? "5" : "4"} style={{ padding: 0, border: 'none' }}>
@@ -359,45 +361,50 @@ export default function DataTablesCard({ dataFood, dataQris }) {
         </table>
       </div>
 
-      {/* AREA PAGINASI BARU */}
-      <div style={styles.paginationWrapper}>
-        <div style={{ fontSize: '13px', color: '#64748b' }}>
-          Tampilkan
-          <select 
-            style={styles.pageSelect} 
-            value={itemsPerPage} 
-            onChange={(e) => setItemsPerPage(Number(e.target.value))}
-          >
-            <option value={5}>5 Baris</option>
-            <option value={10}>10 Baris</option>
-            <option value={25}>25 Baris</option>
-            <option value={50}>50 Baris</option>
-          </select>
-        </div>
-
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+      {/* STRUKTUR PAGINASI BARU */}
+      {totalPages > 1 && (
+        <div style={styles.paginationContainer}>
           <button 
-            style={styles.navBtn(currentPage === 1)} 
-            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            style={styles.iconBtn(currentPage === 1)} 
+            onClick={() => setCurrentPage(1)} 
             disabled={currentPage === 1}
           >
-            &lt; Sebelumnya
+            |&lt;
+          </button>
+          <button 
+            style={styles.iconBtn(currentPage === 1)} 
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))} 
+            disabled={currentPage === 1}
+          >
+            &lt;
           </button>
           
-          <span style={{ fontSize: '13px', color: '#64748b', margin: '0 8px' }}>
-            Hal {currentPage} / {totalPages || 1}
-          </span>
-          
-          <button 
-            style={styles.navBtn(currentPage === totalPages || totalPages === 0)} 
-            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-            disabled={currentPage === totalPages || totalPages === 0}
+          <select 
+            value={currentPage} 
+            onChange={(e) => setCurrentPage(Number(e.target.value))}
+            style={styles.pageSelect}
           >
-            Selanjutnya &gt;
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+              <option key={p} value={p}>{p}</option>
+            ))}
+          </select>
+
+          <button 
+            style={styles.iconBtn(currentPage === totalPages)} 
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} 
+            disabled={currentPage === totalPages}
+          >
+            &gt;
+          </button>
+          <button 
+            style={styles.iconBtn(currentPage === totalPages)} 
+            onClick={() => setCurrentPage(totalPages)} 
+            disabled={currentPage === totalPages}
+          >
+            &gt;|
           </button>
         </div>
-      </div>
-
+      )}
     </div>
   );
 }
