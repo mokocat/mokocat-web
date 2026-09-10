@@ -85,16 +85,19 @@ const styles = {
     fontSize: '10px',
     marginRight: '8px'
   }),
-  // Solusi Animasi Expand yang Mulus
+  // Animasi Expand yang diperbaiki agar super mulus
   expandAnimatedWrapper: (isExpanded) => ({
-    maxHeight: isExpanded ? '500px' : '0px', // Cukup besar untuk menampung isi
-    overflow: 'hidden',
-    transition: 'max-height 0.3s ease-in-out',
+    display: 'grid',
+    gridTemplateRows: isExpanded ? '1fr' : '0fr',
+    transition: 'grid-template-rows 0.3s ease-in-out',
     background: '#f8fafc'
   }),
+  expandInner: {
+    overflow: 'hidden'
+  },
   expandedArea: {
-    padding: '16px',
-    whiteSpace: 'normal', // Memastikan teks bisa turun ke bawah (tidak terpotong)
+    padding: '0 16px 16px 16px',
+    whiteSpace: 'normal',
     borderBottom: '1px solid #e2e8f0'
   },
   detailsGrid: {
@@ -130,13 +133,13 @@ const styles = {
     fontWeight: '600',
     display: 'inline-block'
   },
-  // Solusi Area Bawah (Teks Info & Paginasi Sejajar)
+  // Desain Paginasi Persis Lampiran Gambar
   bottomArea: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    marginTop: '16px',
-    gap: '8px'
+    marginTop: '20px',
+    gap: '12px'
   },
   infoText: {
     fontSize: '13px',
@@ -146,27 +149,29 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: '6px', // Gap diperkecil agar muat di layar HP
-    flexWrap: 'nowrap' // Kunci utama: memaksa elemen tetap 1 baris
+    gap: '12px',
   },
   iconBtn: (disabled) => ({
     background: 'transparent',
     border: 'none',
-    color: disabled ? '#cbd5e1' : '#64748b',
-    cursor: disabled ? 'not-allowed' : 'pointer',
+    color: disabled ? '#cbd5e1' : '#94a3b8',
+    cursor: disabled ? 'default' : 'pointer',
     fontSize: '14px',
     fontWeight: '600',
-    padding: '4px 6px'
+    padding: '4px 8px',
+    transition: 'color 0.2s'
   }),
   pageSelect: {
-    padding: '4px 8px',
+    padding: '4px 12px',
     borderRadius: '6px',
-    border: '1px solid #cbd5e1',
+    border: '1px solid #3b82f6', // Border biru menyesuaikan gambar
     background: '#ffffff',
     fontSize: '13px',
+    fontWeight: '500',
     color: '#0f172a',
     cursor: 'pointer',
     outline: 'none',
+    textAlign: 'center'
   }
 };
 
@@ -185,7 +190,7 @@ export default function DataTablesCard({ dataFood, dataQris }) {
   const [expandedRow, setExpandedRow] = useState(null);
   
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10); 
+  const [itemsPerPage, setItemsPerPage] = useState(5); // Default 5 sesuai gambar
 
   useEffect(() => {
     setCurrentPage(1);
@@ -306,53 +311,55 @@ export default function DataTablesCard({ dataFood, dataQris }) {
                     )}
                   </tr>
 
-                  {/* BARIS DETAIL DENGAN ANIMASI */}
+                  {/* BARIS DETAIL DENGAN ANIMASI GRID (SUPER MULUS) */}
                   <tr>
                     <td colSpan={activeTab === 'food' ? "5" : "4"} style={{ padding: 0, border: 'none' }}>
                       <div style={styles.expandAnimatedWrapper(isExpanded)}>
-                        <div style={styles.expandedArea}>
-                          <div style={styles.detailsGrid}>
-                            {activeTab === 'food' ? (
-                              <>
-                                <div style={styles.detailItem}>
-                                  <span style={styles.detailLabel}>Kotor</span>
-                                  <span style={styles.detailValue}>Rp {parseInt(item.pendapatan_kotor).toLocaleString('id-ID')}</span>
-                                </div>
-                                <div style={styles.detailItem}>
-                                  <span style={styles.detailLabel}>Warung</span>
-                                  <span style={styles.detailValue}>Rp {parseInt(item.pendapatan_warung).toLocaleString('id-ID')}</span>
-                                </div>
-                                <div style={styles.detailItem}>
-                                  <span style={styles.detailLabel}>Diskon</span>
-                                  <span style={styles.detailValue}>Rp {parseInt(item.promo_diskon).toLocaleString('id-ID')}</span>
-                                </div>
-                                <div style={styles.detailItem}>
-                                  <span style={styles.detailLabel}>Ongkir</span>
-                                  <span style={styles.detailValue}>Rp {parseInt(item.promo_ongkir).toLocaleString('id-ID')}</span>
-                                </div>
-                                <div style={styles.detailItem}>
-                                  <span style={styles.detailLabel}>Plus/Minus</span>
-                                  <span style={{...styles.detailValue, color: parseInt(item.plus_minus) < 0 ? '#ef4444' : '#10b981'}}>
-                                    Rp {parseInt(item.plus_minus).toLocaleString('id-ID')}
-                                  </span>
-                                </div>
-                                <div style={styles.detailItem}>
-                                  <span style={styles.detailLabel}>Waktu Input</span>
-                                  <span style={styles.detailValue}>{item.waktu_dibuat}</span>
-                                </div>
-                              </>
-                            ) : (
-                              <>
-                                <div style={styles.detailItem}>
-                                  <span style={styles.detailLabel}>Waktu Input</span>
-                                  <span style={styles.detailValue}>{item.waktu_dibuat}</span>
-                                </div>
-                                <div style={styles.detailItem}>
-                                  <span style={styles.detailLabel}>Diinput Oleh</span>
-                                  <span style={styles.detailValue}>👤 {item.diinput_oleh}</span>
-                                </div>
-                              </>
-                            )}
+                        <div style={styles.expandInner}>
+                          <div style={styles.expandedArea}>
+                            <div style={styles.detailsGrid}>
+                              {activeTab === 'food' ? (
+                                <>
+                                  <div style={styles.detailItem}>
+                                    <span style={styles.detailLabel}>Kotor</span>
+                                    <span style={styles.detailValue}>Rp {parseInt(item.pendapatan_kotor).toLocaleString('id-ID')}</span>
+                                  </div>
+                                  <div style={styles.detailItem}>
+                                    <span style={styles.detailLabel}>Warung</span>
+                                    <span style={styles.detailValue}>Rp {parseInt(item.pendapatan_warung).toLocaleString('id-ID')}</span>
+                                  </div>
+                                  <div style={styles.detailItem}>
+                                    <span style={styles.detailLabel}>Diskon</span>
+                                    <span style={styles.detailValue}>Rp {parseInt(item.promo_diskon).toLocaleString('id-ID')}</span>
+                                  </div>
+                                  <div style={styles.detailItem}>
+                                    <span style={styles.detailLabel}>Ongkir</span>
+                                    <span style={styles.detailValue}>Rp {parseInt(item.promo_ongkir).toLocaleString('id-ID')}</span>
+                                  </div>
+                                  <div style={styles.detailItem}>
+                                    <span style={styles.detailLabel}>Plus/Minus</span>
+                                    <span style={{...styles.detailValue, color: parseInt(item.plus_minus) < 0 ? '#ef4444' : '#10b981'}}>
+                                      Rp {parseInt(item.plus_minus).toLocaleString('id-ID')}
+                                    </span>
+                                  </div>
+                                  <div style={styles.detailItem}>
+                                    <span style={styles.detailLabel}>Waktu Input</span>
+                                    <span style={styles.detailValue}>{item.waktu_dibuat}</span>
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  <div style={styles.detailItem}>
+                                    <span style={styles.detailLabel}>Waktu Input</span>
+                                    <span style={styles.detailValue}>{item.waktu_dibuat}</span>
+                                  </div>
+                                  <div style={styles.detailItem}>
+                                    <span style={styles.detailLabel}>Diinput Oleh</span>
+                                    <span style={styles.detailValue}>👤 {item.diinput_oleh}</span>
+                                  </div>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -367,23 +374,13 @@ export default function DataTablesCard({ dataFood, dataQris }) {
         </table>
       </div>
 
+      {/* AREA PAGINASI BAWAH (PERSIS GAMBAR) */}
       <div style={styles.bottomArea}>
         <div style={styles.infoText}>
           Menampilkan <b>{paginatedData.length > 0 ? startNumber + 1 : 0} - {startNumber + paginatedData.length}</b> dari <b>{activeData.length}</b> data
         </div>
 
         <div style={styles.paginationContainer}>
-          <select 
-            style={styles.pageSelect} 
-            value={itemsPerPage} 
-            onChange={(e) => setItemsPerPage(Number(e.target.value))}
-          >
-            <option value={5}>5 Baris</option>
-            <option value={10}>10 Baris</option>
-            <option value={20}>20 Baris</option>
-            <option value={50}>50 Baris</option>
-          </select>
-
           <button 
             style={styles.iconBtn(currentPage === 1)} 
             onClick={() => setCurrentPage(1)} 
@@ -399,9 +396,18 @@ export default function DataTablesCard({ dataFood, dataQris }) {
             &lt;
           </button>
           
-          <span style={{ fontSize: '13px', color: '#64748b' }}>
-            Hal {currentPage} / {totalPages || 1}
-          </span>
+          {/* Dropdown pemilih JUMLAH DATA di tengah panah navigasi */}
+          <select 
+            style={styles.pageSelect} 
+            value={itemsPerPage} 
+            onChange={(e) => setItemsPerPage(Number(e.target.value))}
+          >
+            <option value={5}>5</option>
+            <option value={8}>8</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+          </select>
           
           <button 
             style={styles.iconBtn(currentPage === totalPages || totalPages === 0)} 
