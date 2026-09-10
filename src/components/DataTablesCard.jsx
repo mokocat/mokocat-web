@@ -1,175 +1,249 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const styles = {
   card: {
     background: '#ffffff',
-    borderRadius: '12px',
+    borderRadius: '16px',
     padding: '24px',
-    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
-    border: '1px solid #eaeaea',
+    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.05)',
+    border: '1px solid #f1f5f9',
   },
-  // Desain Tab Navigasi
   tabContainer: {
     display: 'flex',
-    borderBottom: '1px solid #eaeaea',
-    marginBottom: '20px',
-    gap: '16px'
+    borderBottom: '2px solid #f1f5f9',
+    marginBottom: '24px',
+    gap: '24px'
   },
   tabBtn: (isActive) => ({
-    padding: '10px 16px',
+    padding: '10px 4px',
     cursor: 'pointer',
     background: 'transparent',
     border: 'none',
-    borderBottom: isActive ? '2px solid #2563eb' : '2px solid transparent',
-    color: isActive ? '#2563eb' : '#64748b',
-    fontWeight: isActive ? '600' : '400',
+    borderBottom: isActive ? '3px solid #3b82f6' : '3px solid transparent',
+    color: isActive ? '#3b82f6' : '#94a3b8',
+    fontWeight: isActive ? '600' : '500',
     fontSize: '15px',
-    transition: 'all 0.2s'
+    transition: 'all 0.2s',
+    marginBottom: '-2px' // Menumpuk di atas border bawah
   }),
-  // Desain ala DataTables (Toolbar Pencarian)
   toolbar: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '16px'
+    marginBottom: '20px',
+    flexWrap: 'wrap',
+    gap: '12px'
   },
   searchInput: {
-    padding: '8px 12px',
-    borderRadius: '6px',
-    border: '1px solid #d1d5db',
+    padding: '10px 16px',
+    borderRadius: '8px',
+    border: '1px solid #e2e8f0',
     fontSize: '14px',
-    width: '250px',
-    outline: 'none'
+    width: '100%',
+    maxWidth: '300px',
+    outline: 'none',
+    background: '#f8fafc'
   },
-  infoText: {
-    fontSize: '14px',
-    color: '#64748b'
-  },
-  // Desain Tabel
-  tableContainer: {
+  tableWrapper: {
+    borderRadius: '12px',
+    border: '1px solid #e2e8f0',
+    overflow: 'hidden',
     overflowX: 'auto'
   },
   table: {
     width: '100%',
     borderCollapse: 'collapse',
-    textAlign: 'left'
+    textAlign: 'left',
+    whiteSpace: 'nowrap'
   },
   th: {
-    padding: '12px 16px',
+    padding: '16px',
     background: '#f8fafc',
-    color: '#475569',
+    color: '#64748b',
     fontSize: '13px',
+    fontWeight: '700',
     textTransform: 'uppercase',
-    borderBottom: '2px solid #eaeaea'
+    letterSpacing: '0.5px'
   },
   td: {
-    padding: '14px 16px',
+    padding: '16px',
     fontSize: '14px',
     color: '#334155',
     borderBottom: '1px solid #f1f5f9'
-  }
+  },
+  badgeFood: {
+    background: '#eff6ff',
+    color: '#2563eb',
+    padding: '6px 12px',
+    borderRadius: '20px',
+    fontSize: '12px',
+    fontWeight: '600'
+  },
+  badgeQris: {
+    background: '#ecfdf5',
+    color: '#059669',
+    padding: '6px 12px',
+    borderRadius: '20px',
+    fontSize: '12px',
+    fontWeight: '600'
+  },
+  pagination: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: '20px',
+    fontSize: '14px',
+    color: '#64748b'
+  },
+  pageBtn: (disabled) => ({
+    padding: '8px 16px',
+    borderRadius: '8px',
+    border: '1px solid #e2e8f0',
+    background: disabled ? '#f8fafc' : '#ffffff',
+    color: disabled ? '#94a3b8' : '#0f172a',
+    cursor: disabled ? 'not-allowed' : 'pointer',
+    fontWeight: '600',
+    transition: 'all 0.2s'
+  })
 };
 
 export default function DataTablesCard({ dataFood, dataQris }) {
-  // State untuk Tab Aktif ('food' atau 'qris')
   const [activeTab, setActiveTab] = useState('food');
-  // State untuk Kotak Pencarian
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Konfigurasi Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
-  // Logika Pencarian Data Food (Berdasarkan Merchant atau Tanggal)
+  // Kembalikan ke halaman 1 setiap kali tab diganti atau sedang mencari data
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, searchTerm]);
+
+  // Logika Filter Data
   const filteredFood = dataFood.filter(item => 
     item.merchant.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.tanggal_order.includes(searchTerm)
   );
 
-  // Logika Pencarian Data QRIS (Berdasarkan Tipe atau Tanggal)
   const filteredQris = dataQris.filter(item => 
     item.tipe.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.tanggal.includes(searchTerm)
   );
 
+  // Penentuan Data Aktif & Pemotongan Array untuk Pagination
+  const activeData = activeTab === 'food' ? filteredFood : filteredQris;
+  const totalPages = Math.ceil(activeData.length / itemsPerPage);
+  
+  // Mengambil 10 baris spesifik sesuai halaman saat ini
+  const paginatedData = activeData.slice(
+    (currentPage - 1) * itemsPerPage, 
+    currentPage * itemsPerPage
+  );
+
   return (
     <div style={styles.card}>
       
-      {/* 1. Area Tab Navigasi */}
+      {/* Area Tab Navigasi */}
       <div style={styles.tabContainer}>
         <button 
           style={styles.tabBtn(activeTab === 'food')} 
-          onClick={() => { setActiveTab('food'); setSearchTerm(''); }}
+          onClick={() => setActiveTab('food')}
         >
           🍔 Penjualan Makanan
         </button>
         <button 
           style={styles.tabBtn(activeTab === 'qris')} 
-          onClick={() => { setActiveTab('qris'); setSearchTerm(''); }}
+          onClick={() => setActiveTab('qris')}
         >
           📱 Transaksi QRIS
         </button>
       </div>
 
-      {/* 2. Area Toolbar DataTables (Pencarian & Info) */}
+      {/* Area Pencarian */}
       <div style={styles.toolbar}>
-        <div style={styles.infoText}>
-          Menampilkan <b>{activeTab === 'food' ? filteredFood.length : filteredQris.length}</b> data
+        <div>
+          Menampilkan <b>{paginatedData.length}</b> dari total <b>{activeData.length}</b> data
         </div>
         <input 
           type="text" 
-          placeholder="Cari tanggal atau merchant/tipe..." 
+          placeholder="Cari tanggal, merchant, atau tipe..." 
           style={styles.searchInput}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
-      {/* 3. Area Tabel Dinamis */}
-      <div style={styles.tableContainer}>
-        {activeTab === 'food' ? (
-          <table style={styles.table}>
-            <thead>
+      {/* Area Tabel */}
+      <div style={styles.tableWrapper}>
+        <table style={styles.table}>
+          <thead>
+            {activeTab === 'food' ? (
               <tr>
                 <th style={styles.th}>Tanggal</th>
                 <th style={styles.th}>Merchant</th>
                 <th style={styles.th}>Pendapatan Bersih</th>
                 <th style={styles.th}>Kasir</th>
               </tr>
-            </thead>
-            <tbody>
-              {filteredFood.length > 0 ? filteredFood.map(item => (
-                <tr key={item.id}>
-                  <td style={styles.td}>{item.tanggal_order}</td>
-                  <td style={{...styles.td, fontWeight: '600', color: '#2563eb'}}>{item.merchant}</td>
-                  <td style={styles.td}>Rp {parseInt(item.pendapatan_bersih).toLocaleString('id-ID')}</td>
-                  <td style={styles.td}>{item.diinput_oleh}</td>
-                </tr>
-              )) : (
-                <tr><td colSpan="4" style={{...styles.td, textAlign: 'center'}}>Data tidak ditemukan</td></tr>
-              )}
-            </tbody>
-          </table>
-        ) : (
-          <table style={styles.table}>
-            <thead>
+            ) : (
               <tr>
                 <th style={styles.th}>Tanggal</th>
                 <th style={styles.th}>Tipe QRIS</th>
                 <th style={styles.th}>Nominal Masuk</th>
                 <th style={styles.th}>Kasir</th>
               </tr>
-            </thead>
-            <tbody>
-              {filteredQris.length > 0 ? filteredQris.map(item => (
-                <tr key={item.id}>
-                  <td style={styles.td}>{item.tanggal}</td>
-                  <td style={{...styles.td, fontWeight: '600', color: '#10b981'}}>{item.tipe}</td>
-                  <td style={styles.td}>Rp {parseInt(item.nominal).toLocaleString('id-ID')}</td>
-                  <td style={styles.td}>{item.diinput_oleh}</td>
-                </tr>
-              )) : (
-                <tr><td colSpan="4" style={{...styles.td, textAlign: 'center'}}>Data tidak ditemukan</td></tr>
-              )}
-            </tbody>
-          </table>
-        )}
+            )}
+          </thead>
+          <tbody>
+            {paginatedData.length > 0 ? paginatedData.map((item, index) => (
+              <tr key={item.id} style={{ background: index % 2 === 0 ? '#ffffff' : '#f8fafc' }}>
+                <td style={styles.td}>
+                  {activeTab === 'food' ? item.tanggal_order : item.tanggal}
+                </td>
+                <td style={styles.td}>
+                  {activeTab === 'food' ? (
+                    <span style={styles.badgeFood}>{item.merchant}</span>
+                  ) : (
+                    <span style={styles.badgeQris}>{item.tipe}</span>
+                  )}
+                </td>
+                <td style={{...styles.td, fontWeight: '700', color: '#0f172a'}}>
+                  Rp {parseInt(activeTab === 'food' ? item.pendapatan_bersih : item.nominal).toLocaleString('id-ID')}
+                </td>
+                <td style={styles.td}>{item.diinput_oleh}</td>
+              </tr>
+            )) : (
+              <tr>
+                <td colSpan="4" style={{...styles.td, textAlign: 'center', padding: '32px'}}>
+                  Data tidak ditemukan
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Area Kontrol Pagination */}
+      <div style={styles.pagination}>
+        <button 
+          style={styles.pageBtn(currentPage === 1)}
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+        >
+          Sebelumnya
+        </button>
+        
+        <span style={{ fontWeight: '500' }}>
+          Halaman {currentPage} dari {totalPages || 1}
+        </span>
+        
+        <button 
+          style={styles.pageBtn(currentPage === totalPages || totalPages === 0)}
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages || totalPages === 0}
+        >
+          Selanjutnya
+        </button>
       </div>
 
     </div>
