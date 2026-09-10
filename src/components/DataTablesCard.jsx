@@ -3,50 +3,49 @@ import React, { useState, useEffect } from 'react';
 const styles = {
   card: {
     background: '#ffffff',
-    borderRadius: '16px',
-    padding: '24px',
-    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.05)',
-    border: '1px solid #f1f5f9',
+    borderRadius: '12px',
+    padding: '20px',
+    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
+    border: '1px solid #e2e8f0',
   },
   tabContainer: {
     display: 'flex',
     justifyContent: 'center',
-    borderBottom: '2px solid #f1f5f9',
-    marginBottom: '24px',
+    borderBottom: '1px solid #e2e8f0',
+    marginBottom: '20px',
     gap: '24px'
   },
   tabBtn: (isActive) => ({
-    padding: '10px 16px',
+    padding: '8px 12px',
     cursor: 'pointer',
     background: 'transparent',
     border: 'none',
-    borderBottom: isActive ? '3px solid #3b82f6' : '3px solid transparent',
-    color: isActive ? '#3b82f6' : '#94a3b8',
+    borderBottom: isActive ? '2px solid #2563eb' : '2px solid transparent',
+    color: isActive ? '#2563eb' : '#64748b',
     fontWeight: isActive ? '600' : '500',
-    fontSize: '15px',
+    fontSize: '14px',
     transition: 'all 0.2s',
-    marginBottom: '-2px'
+    marginBottom: '-1px'
   }),
   toolbar: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '20px',
+    marginBottom: '16px',
     flexWrap: 'wrap',
     gap: '12px'
   },
   searchInput: {
-    padding: '10px 16px',
-    borderRadius: '8px',
-    border: '1px solid #e2e8f0',
-    fontSize: '14px',
+    padding: '8px 12px',
+    borderRadius: '6px',
+    border: '1px solid #cbd5e1',
+    fontSize: '13px',
     width: '100%',
-    maxWidth: '300px',
-    outline: 'none',
-    background: '#f8fafc'
+    maxWidth: '250px',
+    outline: 'none'
   },
   tableWrapper: {
-    borderRadius: '12px',
+    borderRadius: '8px',
     border: '1px solid #e2e8f0',
     overflow: 'hidden',
     overflowX: 'auto'
@@ -54,46 +53,44 @@ const styles = {
   table: {
     width: '100%',
     borderCollapse: 'collapse',
-    textAlign: 'center',
     whiteSpace: 'nowrap'
   },
-  th: {
-    padding: '16px',
+  // Alignment dinamis untuk merapikan spasi
+  th: (align = 'left') => ({
+    padding: '12px 16px',
     background: '#f8fafc',
     color: '#64748b',
-    fontSize: '13px',
+    fontSize: '12px',
     fontWeight: '700',
     textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-    textAlign: 'center'
-  },
-  // Row utama yang bisa diklik
+    textAlign: align,
+    borderBottom: '1px solid #e2e8f0'
+  }),
+  td: (align = 'left') => ({
+    padding: '10px 16px',
+    fontSize: '13px',
+    color: '#334155',
+    borderBottom: '1px solid #f1f5f9',
+    textAlign: align
+  }),
   trMain: (isExpanded) => ({
     cursor: 'pointer',
     background: isExpanded ? '#f8fafc' : '#ffffff',
     transition: 'background 0.2s',
-    borderBottom: isExpanded ? 'none' : '1px solid #f1f5f9'
   }),
-  td: {
-    padding: '16px',
-    fontSize: '14px',
-    color: '#334155',
-    textAlign: 'center'
-  },
-  // Desain area detail yang terbuka
-  expandedArea: {
-    background: '#f8fafc',
-    padding: '0 24px 24px 24px',
-    borderBottom: '1px solid #e2e8f0'
-  },
+  // Animasi max-height untuk efek buka-tutup yang mulus
+  expandWrapper: (isExpanded) => ({
+    maxHeight: isExpanded ? '300px' : '0px',
+    overflow: 'hidden',
+    transition: 'max-height 0.3s ease-in-out',
+    background: '#f8fafc'
+  }),
   detailsGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
     gap: '16px',
-    background: '#ffffff',
-    padding: '16px',
-    borderRadius: '8px',
-    border: '1px solid #e2e8f0',
+    padding: '16px 40px',
+    borderTop: '1px dashed #e2e8f0',
     textAlign: 'left'
   },
   detailItem: {
@@ -102,50 +99,60 @@ const styles = {
     gap: '4px'
   },
   detailLabel: {
-    fontSize: '12px',
+    fontSize: '11px',
     color: '#64748b',
-    fontWeight: '600'
+    fontWeight: '600',
+    textTransform: 'uppercase'
   },
   detailValue: {
-    fontSize: '14px',
+    fontSize: '13px',
     color: '#0f172a',
     fontWeight: '500'
   },
   badgeBase: {
-    padding: '6px 12px',
-    borderRadius: '20px',
+    padding: '4px 10px',
+    borderRadius: '12px',
     fontSize: '12px',
     fontWeight: '600',
-    display: 'inline-block',
-    textAlign: 'center'
+    display: 'inline-block'
   },
-  pagination: {
+  // Desain Paginasi ala RDTC (Material)
+  paginationContainer: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: '20px',
-    gap: '8px'
+    gap: '8px',
+    marginTop: '16px'
   },
-  pageNumberBtn: (isActive) => ({
-    width: '36px',
-    height: '36px',
-    borderRadius: '8px',
-    border: isActive ? 'none' : '1px solid #e2e8f0',
-    background: isActive ? '#3b82f6' : '#ffffff',
-    color: isActive ? '#ffffff' : '#64748b',
-    cursor: 'pointer',
-    fontWeight: '600',
+  iconBtn: (disabled) => ({
+    padding: '6px 10px',
+    borderRadius: '6px',
+    border: '1px solid #e2e8f0',
+    background: disabled ? '#f8fafc' : '#ffffff',
+    color: disabled ? '#cbd5e1' : '#64748b',
+    cursor: disabled ? 'not-allowed' : 'pointer',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    transition: 'all 0.2s'
   }),
-  expandIcon: {
+  pageSelect: {
+    padding: '6px 12px',
+    borderRadius: '6px',
+    border: '1px solid #e2e8f0',
+    background: '#ffffff',
+    fontSize: '13px',
+    color: '#0f172a',
+    cursor: 'pointer',
+    outline: 'none'
+  },
+  iconRotate: (isExpanded) => ({
     display: 'inline-block',
-    transition: 'transform 0.2s',
+    transition: 'transform 0.3s ease',
+    transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
     color: '#94a3b8',
-    marginLeft: '8px',
-    fontSize: '12px'
-  }
+    fontSize: '10px'
+  })
 };
 
 const getMerchantStyle = (merchant) => {
@@ -162,16 +169,13 @@ export default function DataTablesCard({ dataFood, dataQris }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  
-  // State untuk melacak baris mana yang sedang ditekan
   const [expandedRow, setExpandedRow] = useState(null);
 
   useEffect(() => {
     setCurrentPage(1);
-    setExpandedRow(null); // Tutup expand saat ganti tab/cari
+    setExpandedRow(null);
   }, [activeTab, searchTerm]);
 
-  // Fungsi untuk buka/tutup baris
   const toggleRow = (id) => {
     setExpandedRow(expandedRow === id ? null : id);
   };
@@ -209,7 +213,7 @@ export default function DataTablesCard({ dataFood, dataQris }) {
       </div>
 
       <div style={styles.toolbar}>
-        <div style={{ fontSize: '14px', color: '#64748b' }}>
+        <div style={{ fontSize: '13px', color: '#64748b' }}>
           Menampilkan <b>{paginatedData.length > 0 ? startNumber + 1 : 0}</b> - <b>{startNumber + paginatedData.length}</b> dari <b>{activeData.length}</b>
         </div>
         <input 
@@ -226,18 +230,20 @@ export default function DataTablesCard({ dataFood, dataQris }) {
           <thead>
             {activeTab === 'food' ? (
               <tr>
-                <th style={styles.th}>No</th>
-                <th style={styles.th}>Tanggal Order</th>
-                <th style={styles.th}>Merchant</th>
-                <th style={styles.th}>Pendapatan Bersih</th>
-                <th style={styles.th}>Status</th>
+                <th style={{...styles.th('center'), width: '40px'}}></th>
+                <th style={styles.th('center')}>No</th>
+                <th style={styles.th('center')}>Tanggal</th>
+                <th style={styles.th('center')}>Merchant</th>
+                <th style={styles.th('right')}>Pendapatan</th>
+                <th style={styles.th('center')}>Status</th>
               </tr>
             ) : (
               <tr>
-                <th style={styles.th}>No</th>
-                <th style={styles.th}>Tanggal</th>
-                <th style={styles.th}>Tipe QRIS</th>
-                <th style={styles.th}>Nominal Masuk</th>
+                <th style={{...styles.th('center'), width: '40px'}}></th>
+                <th style={styles.th('center')}>No</th>
+                <th style={styles.th('center')}>Tanggal</th>
+                <th style={styles.th('center')}>Tipe QRIS</th>
+                <th style={styles.th('right')}>Nominal</th>
               </tr>
             )}
           </thead>
@@ -247,32 +253,28 @@ export default function DataTablesCard({ dataFood, dataQris }) {
               
               return (
                 <React.Fragment key={item.id}>
-                  {/* BARIS UTAMA (BISA DIKLIK) */}
                   <tr style={styles.trMain(isExpanded)} onClick={() => toggleRow(item.id)}>
-                    <td style={styles.td}>
-                      {startNumber + index + 1}
-                      <span style={{...styles.expandIcon, transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'}}>
-                        ▼
-                      </span>
+                    <td style={styles.td('center')}>
+                      <span style={styles.iconRotate(isExpanded)}>▼</span>
                     </td>
+                    <td style={styles.td('center')}>{startNumber + index + 1}</td>
                     
                     {activeTab === 'food' ? (
                       <>
-                        <td style={styles.td}>{item.tanggal_order}</td>
-                        <td style={styles.td}>
+                        <td style={styles.td('center')}>{item.tanggal_order}</td>
+                        <td style={styles.td('center')}>
                           <span style={{ ...styles.badgeBase, background: getMerchantStyle(item.merchant).bg, color: getMerchantStyle(item.merchant).color }}>
                             {item.merchant}
                           </span>
                         </td>
-                        <td style={{...styles.td, fontWeight: '700', color: '#0f172a'}}>
+                        <td style={{...styles.td('right'), fontWeight: '600'}}>
                           Rp {parseInt(item.pendapatan_bersih).toLocaleString('id-ID')}
                         </td>
-                        <td style={styles.td}>
+                        <td style={styles.td('center')}>
                           <span style={{
                             ...styles.badgeBase,
-                            background: item.status === 'Transferred' ? '#f0fdf4' : '#f8fafc',
-                            color: item.status === 'Transferred' ? '#15803d' : '#64748b',
-                            border: '1px solid #e2e8f0'
+                            background: item.status === 'Transferred' ? '#dcfce3' : '#f1f5f9',
+                            color: item.status === 'Transferred' ? '#16a34a' : '#64748b',
                           }}>
                             {item.status}
                           </span>
@@ -280,100 +282,121 @@ export default function DataTablesCard({ dataFood, dataQris }) {
                       </>
                     ) : (
                       <>
-                        <td style={styles.td}>{item.tanggal}</td>
-                        <td style={styles.td}>
+                        <td style={styles.td('center')}>{item.tanggal}</td>
+                        <td style={styles.td('center')}>
                           <span style={{ ...styles.badgeBase, background: '#ecfdf5', color: '#059669' }}>
                             {item.tipe}
                           </span>
                         </td>
-                        <td style={{...styles.td, fontWeight: '700', color: '#0f172a'}}>
+                        <td style={{...styles.td('right'), fontWeight: '600'}}>
                           Rp {parseInt(item.nominal).toLocaleString('id-ID')}
                         </td>
                       </>
                     )}
                   </tr>
 
-                  {/* AREA EXPAND (RINCIAN DETAIL DATABASES) */}
-                  {isExpanded && (
-                    <tr>
-                      <td colSpan={activeTab === 'food' ? "5" : "4"} style={{ padding: 0, borderBottom: '1px solid #f1f5f9' }}>
-                        <div style={styles.expandedArea}>
-                          <div style={styles.detailsGrid}>
-                            
-                            {activeTab === 'food' ? (
-                              <>
-                                <div style={styles.detailItem}>
-                                  <span style={styles.detailLabel}>Pendapatan Kotor</span>
-                                  <span style={styles.detailValue}>Rp {parseInt(item.pendapatan_kotor).toLocaleString('id-ID')}</span>
-                                </div>
-                                <div style={styles.detailItem}>
-                                  <span style={styles.detailLabel}>Pendapatan Warung</span>
-                                  <span style={styles.detailValue}>Rp {parseInt(item.pendapatan_warung).toLocaleString('id-ID')}</span>
-                                </div>
-                                <div style={styles.detailItem}>
-                                  <span style={styles.detailLabel}>Promo Diskon</span>
-                                  <span style={styles.detailValue}>Rp {parseInt(item.promo_diskon).toLocaleString('id-ID')}</span>
-                                </div>
-                                <div style={styles.detailItem}>
-                                  <span style={styles.detailLabel}>Promo Ongkir</span>
-                                  <span style={styles.detailValue}>Rp {parseInt(item.promo_ongkir).toLocaleString('id-ID')}</span>
-                                </div>
-                                <div style={styles.detailItem}>
-                                  <span style={styles.detailLabel}>Plus/Minus</span>
-                                  <span style={{...styles.detailValue, color: parseInt(item.plus_minus) < 0 ? '#ef4444' : '#10b981'}}>
-                                    Rp {parseInt(item.plus_minus).toLocaleString('id-ID')}
-                                  </span>
-                                </div>
-                                <div style={styles.detailItem}>
-                                  <span style={styles.detailLabel}>Waktu Input</span>
-                                  <span style={styles.detailValue}>{item.waktu_dibuat}</span>
-                                </div>
-                                <div style={styles.detailItem}>
-                                  <span style={styles.detailLabel}>Diinput Oleh</span>
-                                  <span style={styles.detailValue}>👤 {item.diinput_oleh}</span>
-                                </div>
-                              </>
-                            ) : (
-                              <>
-                                <div style={styles.detailItem}>
-                                  <span style={styles.detailLabel}>Waktu Input</span>
-                                  <span style={styles.detailValue}>{item.waktu_dibuat}</span>
-                                </div>
-                                <div style={styles.detailItem}>
-                                  <span style={styles.detailLabel}>Diinput Oleh</span>
-                                  <span style={styles.detailValue}>👤 {item.diinput_oleh}</span>
-                                </div>
-                              </>
-                            )}
-
-                          </div>
+                  {/* Render elemen detail secara permanen untuk keperluan transisi CSS */}
+                  <tr>
+                    <td colSpan={activeTab === 'food' ? "6" : "5"} style={{ padding: 0, border: 'none' }}>
+                      <div style={styles.expandWrapper(isExpanded)}>
+                        <div style={styles.detailsGrid}>
+                          {activeTab === 'food' ? (
+                            <>
+                              <div style={styles.detailItem}>
+                                <span style={styles.detailLabel}>Kotor</span>
+                                <span style={styles.detailValue}>Rp {parseInt(item.pendapatan_kotor).toLocaleString('id-ID')}</span>
+                              </div>
+                              <div style={styles.detailItem}>
+                                <span style={styles.detailLabel}>Warung</span>
+                                <span style={styles.detailValue}>Rp {parseInt(item.pendapatan_warung).toLocaleString('id-ID')}</span>
+                              </div>
+                              <div style={styles.detailItem}>
+                                <span style={styles.detailLabel}>Diskon</span>
+                                <span style={styles.detailValue}>Rp {parseInt(item.promo_diskon).toLocaleString('id-ID')}</span>
+                              </div>
+                              <div style={styles.detailItem}>
+                                <span style={styles.detailLabel}>Ongkir</span>
+                                <span style={styles.detailValue}>Rp {parseInt(item.promo_ongkir).toLocaleString('id-ID')}</span>
+                              </div>
+                              <div style={styles.detailItem}>
+                                <span style={styles.detailLabel}>Plus/Minus</span>
+                                <span style={{...styles.detailValue, color: parseInt(item.plus_minus) < 0 ? '#ef4444' : '#10b981'}}>
+                                  Rp {parseInt(item.plus_minus).toLocaleString('id-ID')}
+                                </span>
+                              </div>
+                              <div style={styles.detailItem}>
+                                <span style={styles.detailLabel}>Waktu</span>
+                                <span style={styles.detailValue}>{item.waktu_dibuat}</span>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div style={styles.detailItem}>
+                                <span style={styles.detailLabel}>Waktu Input</span>
+                                <span style={styles.detailValue}>{item.waktu_dibuat}</span>
+                              </div>
+                              <div style={styles.detailItem}>
+                                <span style={styles.detailLabel}>Diinput Oleh</span>
+                                <span style={styles.detailValue}>👤 {item.diinput_oleh}</span>
+                              </div>
+                            </>
+                          )}
                         </div>
-                      </td>
-                    </tr>
-                  )}
+                      </div>
+                    </td>
+                  </tr>
                 </React.Fragment>
               );
             }) : (
-              <tr><td colSpan="5" style={{...styles.td, padding: '32px'}}>Data tidak ditemukan</td></tr>
+              <tr><td colSpan="6" style={{...styles.td('center'), padding: '32px'}}>Data tidak ditemukan</td></tr>
             )}
           </tbody>
         </table>
       </div>
 
       {totalPages > 1 && (
-        <div style={styles.pagination}>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-            <button
-              key={page}
-              style={styles.pageNumberBtn(currentPage === page)}
-              onClick={() => setCurrentPage(page)}
-            >
-              {page}
-            </button>
-          ))}
+        <div style={styles.paginationContainer}>
+          <button 
+            style={styles.iconBtn(currentPage === 1)} 
+            onClick={() => setCurrentPage(1)} 
+            disabled={currentPage === 1}
+          >
+            |&lt;
+          </button>
+          <button 
+            style={styles.iconBtn(currentPage === 1)} 
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))} 
+            disabled={currentPage === 1}
+          >
+            &lt;
+          </button>
+          
+          <select 
+            value={currentPage} 
+            onChange={(e) => setCurrentPage(Number(e.target.value))}
+            style={styles.pageSelect}
+          >
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+              <option key={p} value={p}>Halaman {p}</option>
+            ))}
+          </select>
+
+          <button 
+            style={styles.iconBtn(currentPage === totalPages)} 
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} 
+            disabled={currentPage === totalPages}
+          >
+            &gt;
+          </button>
+          <button 
+            style={styles.iconBtn(currentPage === totalPages)} 
+            onClick={() => setCurrentPage(totalPages)} 
+            disabled={currentPage === totalPages}
+          >
+            &gt;|
+          </button>
         </div>
       )}
-
     </div>
   );
 }
