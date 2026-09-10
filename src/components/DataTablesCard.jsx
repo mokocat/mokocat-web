@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const styles = {
   card: {
@@ -10,7 +10,7 @@ const styles = {
   },
   tabContainer: {
     display: 'flex',
-    justifyContent: 'center', // Membuat tab menu rata tengah
+    justifyContent: 'center',
     borderBottom: '2px solid #f1f5f9',
     marginBottom: '24px',
     gap: '24px'
@@ -54,7 +54,7 @@ const styles = {
   table: {
     width: '100%',
     borderCollapse: 'collapse',
-    textAlign: 'center', // Mengubah rata kiri menjadi rata tengah untuk keseluruhan tabel
+    textAlign: 'center',
     whiteSpace: 'nowrap'
   },
   th: {
@@ -65,14 +65,51 @@ const styles = {
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
-    textAlign: 'center' // Memastikan judul kolom rata tengah
+    textAlign: 'center'
   },
+  // Row utama yang bisa diklik
+  trMain: (isExpanded) => ({
+    cursor: 'pointer',
+    background: isExpanded ? '#f8fafc' : '#ffffff',
+    transition: 'background 0.2s',
+    borderBottom: isExpanded ? 'none' : '1px solid #f1f5f9'
+  }),
   td: {
     padding: '16px',
     fontSize: '14px',
     color: '#334155',
-    borderBottom: '1px solid #f1f5f9',
-    textAlign: 'center' // Memastikan isi baris rata tengah
+    textAlign: 'center'
+  },
+  // Desain area detail yang terbuka
+  expandedArea: {
+    background: '#f8fafc',
+    padding: '0 24px 24px 24px',
+    borderBottom: '1px solid #e2e8f0'
+  },
+  detailsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+    gap: '16px',
+    background: '#ffffff',
+    padding: '16px',
+    borderRadius: '8px',
+    border: '1px solid #e2e8f0',
+    textAlign: 'left'
+  },
+  detailItem: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px'
+  },
+  detailLabel: {
+    fontSize: '12px',
+    color: '#64748b',
+    fontWeight: '600'
+  },
+  detailValue: {
+    fontSize: '14px',
+    color: '#0f172a',
+    fontWeight: '500'
   },
   badgeBase: {
     padding: '6px 12px',
@@ -84,7 +121,7 @@ const styles = {
   },
   pagination: {
     display: 'flex',
-    justifyContent: 'center', // Mengubah flex-end (kanan) menjadi center (tengah)
+    justifyContent: 'center',
     alignItems: 'center',
     marginTop: '20px',
     gap: '8px'
@@ -98,36 +135,46 @@ const styles = {
     color: isActive ? '#ffffff' : '#64748b',
     cursor: 'pointer',
     fontWeight: '600',
-    transition: 'all 0.2s',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center'
-  })
+  }),
+  expandIcon: {
+    display: 'inline-block',
+    transition: 'transform 0.2s',
+    color: '#94a3b8',
+    marginLeft: '8px',
+    fontSize: '12px'
+  }
 };
 
 const getMerchantStyle = (merchant) => {
   switch (merchant) {
-    case 'ShopeeFood': 
-      return { bg: '#ffedd5', color: '#ea580c' }; 
-    case 'GoFood': 
-      return { bg: '#fee2e2', color: '#dc2626' }; 
-    case 'GrabFood': 
-      return { bg: '#dcfce3', color: '#16a34a' }; 
-    default: 
-      return { bg: '#f1f5f9', color: '#475569' }; 
+    case 'ShopeeFood': return { bg: '#ffedd5', color: '#ea580c' }; 
+    case 'GoFood': return { bg: '#fee2e2', color: '#dc2626' }; 
+    case 'GrabFood': return { bg: '#dcfce3', color: '#16a34a' }; 
+    default: return { bg: '#f1f5f9', color: '#475569' }; 
   }
 };
 
 export default function DataTablesCard({ dataFood, dataQris }) {
   const [activeTab, setActiveTab] = useState('food');
   const [searchTerm, setSearchTerm] = useState('');
-  
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  
+  // State untuk melacak baris mana yang sedang ditekan
+  const [expandedRow, setExpandedRow] = useState(null);
 
   useEffect(() => {
     setCurrentPage(1);
+    setExpandedRow(null); // Tutup expand saat ganti tab/cari
   }, [activeTab, searchTerm]);
+
+  // Fungsi untuk buka/tutup baris
+  const toggleRow = (id) => {
+    setExpandedRow(expandedRow === id ? null : id);
+  };
 
   const filteredFood = dataFood.filter(item => 
     item.merchant.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -147,34 +194,27 @@ export default function DataTablesCard({ dataFood, dataQris }) {
     (currentPage - 1) * itemsPerPage, 
     currentPage * itemsPerPage
   );
-
   const startNumber = (currentPage - 1) * itemsPerPage;
 
   return (
     <div style={styles.card}>
       
       <div style={styles.tabContainer}>
-        <button 
-          style={styles.tabBtn(activeTab === 'food')} 
-          onClick={() => setActiveTab('food')}
-        >
+        <button style={styles.tabBtn(activeTab === 'food')} onClick={() => setActiveTab('food')}>
           🍔 Penjualan Makanan
         </button>
-        <button 
-          style={styles.tabBtn(activeTab === 'qris')} 
-          onClick={() => setActiveTab('qris')}
-        >
+        <button style={styles.tabBtn(activeTab === 'qris')} onClick={() => setActiveTab('qris')}>
           📱 Transaksi QRIS
         </button>
       </div>
 
       <div style={styles.toolbar}>
         <div style={{ fontSize: '14px', color: '#64748b' }}>
-          Menampilkan <b>{paginatedData.length > 0 ? startNumber + 1 : 0}</b> - <b>{startNumber + paginatedData.length}</b> dari total <b>{activeData.length}</b> data
+          Menampilkan <b>{paginatedData.length > 0 ? startNumber + 1 : 0}</b> - <b>{startNumber + paginatedData.length}</b> dari <b>{activeData.length}</b>
         </div>
         <input 
           type="text" 
-          placeholder="Ketik untuk mencari..." 
+          placeholder="Cari data..." 
           style={styles.searchInput}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -189,7 +229,6 @@ export default function DataTablesCard({ dataFood, dataQris }) {
                 <th style={styles.th}>No</th>
                 <th style={styles.th}>Tanggal Order</th>
                 <th style={styles.th}>Merchant</th>
-                <th style={styles.th}>Pendapatan Kotor</th>
                 <th style={styles.th}>Pendapatan Bersih</th>
                 <th style={styles.th}>Status</th>
               </tr>
@@ -199,69 +238,123 @@ export default function DataTablesCard({ dataFood, dataQris }) {
                 <th style={styles.th}>Tanggal</th>
                 <th style={styles.th}>Tipe QRIS</th>
                 <th style={styles.th}>Nominal Masuk</th>
-                <th style={styles.th}>Kasir</th>
               </tr>
             )}
           </thead>
           <tbody>
-            {paginatedData.length > 0 ? paginatedData.map((item, index) => (
-              <tr key={item.id} style={{ background: index % 2 === 0 ? '#ffffff' : '#f8fafc' }}>
-                <td style={styles.td}>{startNumber + index + 1}</td>
-                
-                {activeTab === 'food' ? (
-                  <>
-                    <td style={styles.td}>{item.tanggal_order}</td>
+            {paginatedData.length > 0 ? paginatedData.map((item, index) => {
+              const isExpanded = expandedRow === item.id;
+              
+              return (
+                <React.Fragment key={item.id}>
+                  {/* BARIS UTAMA (BISA DIKLIK) */}
+                  <tr style={styles.trMain(isExpanded)} onClick={() => toggleRow(item.id)}>
                     <td style={styles.td}>
-                      <span style={{
-                        ...styles.badgeBase, 
-                        background: getMerchantStyle(item.merchant).bg, 
-                        color: getMerchantStyle(item.merchant).color
-                      }}>
-                        {item.merchant}
+                      {startNumber + index + 1}
+                      <span style={{...styles.expandIcon, transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'}}>
+                        ▼
                       </span>
                     </td>
-                    <td style={styles.td}>
-                      Rp {parseInt(item.pendapatan_kotor).toLocaleString('id-ID')}
-                    </td>
-                    <td style={{...styles.td, fontWeight: '700', color: '#0f172a'}}>
-                      Rp {parseInt(item.pendapatan_bersih).toLocaleString('id-ID')}
-                    </td>
-                    <td style={styles.td}>
-                      <span style={{
-                        ...styles.badgeBase,
-                        background: item.status === 'Transferred' ? '#f0fdf4' : '#f8fafc',
-                        color: item.status === 'Transferred' ? '#15803d' : '#64748b',
-                        border: '1px solid #e2e8f0'
-                      }}>
-                        {item.status}
-                      </span>
-                    </td>
-                  </>
-                ) : (
-                  <>
-                    <td style={styles.td}>{item.tanggal}</td>
-                    <td style={styles.td}>
-                      <span style={{
-                        ...styles.badgeBase,
-                        background: '#ecfdf5',
-                        color: '#059669'
-                      }}>
-                        {item.tipe}
-                      </span>
-                    </td>
-                    <td style={{...styles.td, fontWeight: '700', color: '#0f172a'}}>
-                      Rp {parseInt(item.nominal).toLocaleString('id-ID')}
-                    </td>
-                    <td style={styles.td}>{item.diinput_oleh}</td>
-                  </>
-                )}
-              </tr>
-            )) : (
-              <tr>
-                <td colSpan={activeTab === 'food' ? "6" : "5"} style={{...styles.td, textAlign: 'center', padding: '32px'}}>
-                  Data tidak ditemukan
-                </td>
-              </tr>
+                    
+                    {activeTab === 'food' ? (
+                      <>
+                        <td style={styles.td}>{item.tanggal_order}</td>
+                        <td style={styles.td}>
+                          <span style={{ ...styles.badgeBase, background: getMerchantStyle(item.merchant).bg, color: getMerchantStyle(item.merchant).color }}>
+                            {item.merchant}
+                          </span>
+                        </td>
+                        <td style={{...styles.td, fontWeight: '700', color: '#0f172a'}}>
+                          Rp {parseInt(item.pendapatan_bersih).toLocaleString('id-ID')}
+                        </td>
+                        <td style={styles.td}>
+                          <span style={{
+                            ...styles.badgeBase,
+                            background: item.status === 'Transferred' ? '#f0fdf4' : '#f8fafc',
+                            color: item.status === 'Transferred' ? '#15803d' : '#64748b',
+                            border: '1px solid #e2e8f0'
+                          }}>
+                            {item.status}
+                          </span>
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td style={styles.td}>{item.tanggal}</td>
+                        <td style={styles.td}>
+                          <span style={{ ...styles.badgeBase, background: '#ecfdf5', color: '#059669' }}>
+                            {item.tipe}
+                          </span>
+                        </td>
+                        <td style={{...styles.td, fontWeight: '700', color: '#0f172a'}}>
+                          Rp {parseInt(item.nominal).toLocaleString('id-ID')}
+                        </td>
+                      </>
+                    )}
+                  </tr>
+
+                  {/* AREA EXPAND (RINCIAN DETAIL DATABASES) */}
+                  {isExpanded && (
+                    <tr>
+                      <td colSpan={activeTab === 'food' ? "5" : "4"} style={{ padding: 0, borderBottom: '1px solid #f1f5f9' }}>
+                        <div style={styles.expandedArea}>
+                          <div style={styles.detailsGrid}>
+                            
+                            {activeTab === 'food' ? (
+                              <>
+                                <div style={styles.detailItem}>
+                                  <span style={styles.detailLabel}>Pendapatan Kotor</span>
+                                  <span style={styles.detailValue}>Rp {parseInt(item.pendapatan_kotor).toLocaleString('id-ID')}</span>
+                                </div>
+                                <div style={styles.detailItem}>
+                                  <span style={styles.detailLabel}>Pendapatan Warung</span>
+                                  <span style={styles.detailValue}>Rp {parseInt(item.pendapatan_warung).toLocaleString('id-ID')}</span>
+                                </div>
+                                <div style={styles.detailItem}>
+                                  <span style={styles.detailLabel}>Promo Diskon</span>
+                                  <span style={styles.detailValue}>Rp {parseInt(item.promo_diskon).toLocaleString('id-ID')}</span>
+                                </div>
+                                <div style={styles.detailItem}>
+                                  <span style={styles.detailLabel}>Promo Ongkir</span>
+                                  <span style={styles.detailValue}>Rp {parseInt(item.promo_ongkir).toLocaleString('id-ID')}</span>
+                                </div>
+                                <div style={styles.detailItem}>
+                                  <span style={styles.detailLabel}>Plus/Minus</span>
+                                  <span style={{...styles.detailValue, color: parseInt(item.plus_minus) < 0 ? '#ef4444' : '#10b981'}}>
+                                    Rp {parseInt(item.plus_minus).toLocaleString('id-ID')}
+                                  </span>
+                                </div>
+                                <div style={styles.detailItem}>
+                                  <span style={styles.detailLabel}>Waktu Input</span>
+                                  <span style={styles.detailValue}>{item.waktu_dibuat}</span>
+                                </div>
+                                <div style={styles.detailItem}>
+                                  <span style={styles.detailLabel}>Diinput Oleh</span>
+                                  <span style={styles.detailValue}>👤 {item.diinput_oleh}</span>
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <div style={styles.detailItem}>
+                                  <span style={styles.detailLabel}>Waktu Input</span>
+                                  <span style={styles.detailValue}>{item.waktu_dibuat}</span>
+                                </div>
+                                <div style={styles.detailItem}>
+                                  <span style={styles.detailLabel}>Diinput Oleh</span>
+                                  <span style={styles.detailValue}>👤 {item.diinput_oleh}</span>
+                                </div>
+                              </>
+                            )}
+
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              );
+            }) : (
+              <tr><td colSpan="5" style={{...styles.td, padding: '32px'}}>Data tidak ditemukan</td></tr>
             )}
           </tbody>
         </table>
