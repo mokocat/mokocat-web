@@ -12,7 +12,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     borderBottom: '1px solid #e2e8f0',
-    marginBottom: '20px',
+    marginBottom: '16px',
     gap: '24px'
   },
   tabBtn: (isActive) => ({
@@ -27,7 +27,6 @@ const styles = {
     transition: 'all 0.2s',
     marginBottom: '-1px'
   }),
-  // Toolbar Atas (Hanya Kotak Pencarian, Rata Kanan)
   toolbarWrapper: {
     display: 'flex',
     justifyContent: 'flex-end',
@@ -36,7 +35,7 @@ const styles = {
   searchInput: {
     padding: '10px 16px',
     borderRadius: '8px',
-    background: '#ffffff', // Warna standar terang
+    background: '#ffffff',
     color: '#0f172a',
     border: '1px solid #cbd5e1',
     fontSize: '14px',
@@ -78,11 +77,25 @@ const styles = {
     background: isExpanded ? '#f8fafc' : '#ffffff',
     transition: 'background 0.2s',
   }),
+  iconRotate: (isExpanded) => ({
+    display: 'inline-block',
+    transition: 'transform 0.3s ease',
+    transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+    color: '#94a3b8',
+    fontSize: '10px',
+    marginRight: '8px'
+  }),
+  // Solusi Animasi Expand yang Mulus
+  expandAnimatedWrapper: (isExpanded) => ({
+    maxHeight: isExpanded ? '500px' : '0px', // Cukup besar untuk menampung isi
+    overflow: 'hidden',
+    transition: 'max-height 0.3s ease-in-out',
+    background: '#f8fafc'
+  }),
   expandedArea: {
-    background: '#f8fafc',
-    padding: '0 16px 16px 16px',
-    borderBottom: '1px solid #e2e8f0',
-    whiteSpace: 'normal'
+    padding: '16px',
+    whiteSpace: 'normal', // Memastikan teks bisa turun ke bawah (tidak terpotong)
+    borderBottom: '1px solid #e2e8f0'
   },
   detailsGrid: {
     display: 'grid',
@@ -117,21 +130,13 @@ const styles = {
     fontWeight: '600',
     display: 'inline-block'
   },
-  iconRotate: (isExpanded) => ({
-    display: 'inline-block',
-    transition: 'transform 0.2s',
-    transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-    color: '#94a3b8',
-    fontSize: '10px',
-    marginRight: '8px'
-  }),
-  // Area Bawah (Info Data & Paginasi)
+  // Solusi Area Bawah (Teks Info & Paginasi Sejajar)
   bottomArea: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    marginTop: '20px',
-    gap: '12px'
+    marginTop: '16px',
+    gap: '8px'
   },
   infoText: {
     fontSize: '13px',
@@ -141,8 +146,8 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: '12px',
-    flexWrap: 'wrap'
+    gap: '6px', // Gap diperkecil agar muat di layar HP
+    flexWrap: 'nowrap' // Kunci utama: memaksa elemen tetap 1 baris
   },
   iconBtn: (disabled) => ({
     background: 'transparent',
@@ -151,10 +156,10 @@ const styles = {
     cursor: disabled ? 'not-allowed' : 'pointer',
     fontSize: '14px',
     fontWeight: '600',
-    padding: '4px 8px'
+    padding: '4px 6px'
   }),
   pageSelect: {
-    padding: '6px 12px',
+    padding: '4px 8px',
     borderRadius: '6px',
     border: '1px solid #cbd5e1',
     background: '#ffffff',
@@ -301,9 +306,10 @@ export default function DataTablesCard({ dataFood, dataQris }) {
                     )}
                   </tr>
 
-                  {isExpanded && (
-                    <tr>
-                      <td colSpan={activeTab === 'food' ? "5" : "4"} style={{ padding: 0, border: 'none' }}>
+                  {/* BARIS DETAIL DENGAN ANIMASI */}
+                  <tr>
+                    <td colSpan={activeTab === 'food' ? "5" : "4"} style={{ padding: 0, border: 'none' }}>
+                      <div style={styles.expandAnimatedWrapper(isExpanded)}>
                         <div style={styles.expandedArea}>
                           <div style={styles.detailsGrid}>
                             {activeTab === 'food' ? (
@@ -331,7 +337,7 @@ export default function DataTablesCard({ dataFood, dataQris }) {
                                   </span>
                                 </div>
                                 <div style={styles.detailItem}>
-                                  <span style={styles.detailLabel}>Waktu</span>
+                                  <span style={styles.detailLabel}>Waktu Input</span>
                                   <span style={styles.detailValue}>{item.waktu_dibuat}</span>
                                 </div>
                               </>
@@ -349,9 +355,9 @@ export default function DataTablesCard({ dataFood, dataQris }) {
                             )}
                           </div>
                         </div>
-                      </td>
-                    </tr>
-                  )}
+                      </div>
+                    </td>
+                  </tr>
                 </React.Fragment>
               );
             }) : (
