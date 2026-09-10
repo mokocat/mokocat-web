@@ -7,7 +7,7 @@ function App() {
   const [dataQris, setDataQris] = useState([]) // Siap untuk menampung data QRIS nanti
 
   useEffect(() => {
-    fetch('https://domainkamu.com/api_food.php')
+    fetch('https://mokocat.app/api.php')
       .then(res => res.json())
       .then(result => {
         if (result.status === 'success') {
