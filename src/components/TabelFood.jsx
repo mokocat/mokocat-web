@@ -1,22 +1,63 @@
+const styles = {
+  card: {
+    background: '#ffffff',
+    borderRadius: '12px',
+    padding: '20px',
+    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
+    border: '1px solid #eaeaea',
+    overflowX: 'auto'
+  },
+  title: {
+    margin: '0 0 16px 0',
+    fontSize: '18px',
+    color: '#0f172a'
+  },
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse',
+    textAlign: 'left'
+  },
+  th: {
+    padding: '12px',
+    background: '#f8fafc',
+    color: '#475569',
+    fontSize: '14px',
+    borderBottom: '1px solid #eaeaea'
+  },
+  td: {
+    padding: '12px',
+    fontSize: '14px',
+    color: '#334155',
+    borderBottom: '1px solid #f1f5f9'
+  },
+  merchant: {
+    fontWeight: '600',
+    color: '#2563eb'
+  }
+};
+
 export default function TabelFood({ data }) {
   return (
-    <table border="1" width="100%" cellPadding="8" style={{ borderCollapse: 'collapse', marginBottom: '20px' }}>
-      <thead style={{ background: '#f4f4f4' }}>
-        <tr>
-          <th>Tanggal</th>
-          <th>Merchant</th>
-          <th>Pendapatan</th>
-        </tr>
-      </thead>
-      <tbody>
-        {data.map(item => (
-          <tr key={item.id}>
-            <td>{item.tanggal_order}</td>
-            <td>{item.merchant}</td>
-            <td>Rp {parseInt(item.pendapatan_bersih).toLocaleString('id-ID')}</td>
+    <div style={styles.card}>
+      <h3 style={styles.title}>Data Transaksi Makanan</h3>
+      <table style={styles.table}>
+        <thead>
+          <tr>
+            <th style={styles.th}>Tanggal</th>
+            <th style={styles.th}>Merchant</th>
+            <th style={styles.th}>Nominal</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
-  )
+        </thead>
+        <tbody>
+          {data.map(item => (
+            <tr key={item.id}>
+              <td style={styles.td}>{item.tanggal_order}</td>
+              <td style={{ ...styles.td, ...styles.merchant }}>{item.merchant}</td>
+              <td style={styles.td}>Rp {parseInt(item.pendapatan_bersih).toLocaleString('id-ID')}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
