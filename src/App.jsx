@@ -1,42 +1,32 @@
 import { useEffect, useState } from 'react'
+// Mengimpor komponen balok Lego yang baru kita buat
+import TabelFood from './components/TabelFood' 
 
 function App() {
   const [dataFood, setDataFood] = useState([])
+  const [dataQris, setDataQris] = useState([]) // Siap untuk menampung data QRIS nanti
 
-    useEffect(() => {
-        // Ganti URL ini dengan URL API PHP di cPanel kamu
-            fetch('https://mokocat.app/api.php')
-                  .then(res => res.json())
-                        .then(result => {
-                                if (result.status === 'success') {
-                                          setDataFood(result.data_food)
-                                                  }
-                                                        })
-                                                          }, [])
+  useEffect(() => {
+    fetch('https://domainkamu.com/api_food.php')
+      .then(res => res.json())
+      .then(result => {
+        if (result.status === 'success') {
+          setDataFood(result.data_food)
+          setDataQris(result.data_qris)
+        }
+      })
+  }, [])
 
-                                                            return (
-                                                                <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-                                                                      <h2>Dasbor MokoCat</h2>
-                                                                            <table border="1" width="100%" cellPadding="8" style={{ borderCollapse: 'collapse' }}>
-                                                                                    <thead style={{ background: '#f4f4f4' }}>
-                                                                                              <tr>
-                                                                                                          <th>Tanggal</th>
-                                                                                                                      <th>Merchant</th>
-                                                                                                                                  <th>Pendapatan</th>
-                                                                                                                                            </tr>
-                                                                                                                                                    </thead>
-                                                                                                                                                            <tbody>
-                                                                                                                                                                      {dataFood.map(item => (
-                                                                                                                                                                                  <tr key={item.id}>
-                                                                                                                                                                                                <td>{item.tanggal_order}</td>
-                                                                                                                                                                                                              <td>{item.merchant}</td>
-                                                                                                                                                                                                                            <td>Rp {item.pendapatan_bersih}</td>
-                                                                                                                                                                                                                                        </tr>
-                                                                                                                                                                                                                                                  ))}
-                                                                                                                                                                                                                                                          </tbody>
-                                                                                                                                                                                                                                                                </table>
-                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                      )
-                                                                                                                                                                                                                                                                      }
+  return (
+    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
+      <h2>Dasbor MokoCat</h2>
+      
+      <h3>Riwayat Penjualan Makanan</h3>
+      {/* Memanggil komponen dan mengirimkan isi dataFood ke dalamnya */}
+      <TabelFood data={dataFood} />
+      
+    </div>
+  )
+}
 
-                                                                                                                                                                                                                                                                      export default App
+export default App
