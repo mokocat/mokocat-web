@@ -27,27 +27,22 @@ const styles = {
     transition: 'all 0.2s',
     marginBottom: '-1px'
   }),
-  // Desain Toolbar Baru (Sesuai Gambar)
+  // Toolbar Atas (Hanya Kotak Pencarian, Rata Kanan)
   toolbarWrapper: {
     display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-    marginBottom: '20px'
-  },
-  infoText: {
-    fontSize: '13px',
-    color: '#64748b'
+    justifyContent: 'flex-end',
+    marginBottom: '16px'
   },
   searchInput: {
-    padding: '12px 16px',
+    padding: '10px 16px',
     borderRadius: '8px',
-    background: '#3f3f46', // Warna gelap sesuai gambar
-    color: '#ffffff',
-    border: 'none',
+    background: '#ffffff', // Warna standar terang
+    color: '#0f172a',
+    border: '1px solid #cbd5e1',
     fontSize: '14px',
     width: '100%',
-    outline: 'none',
-    boxSizing: 'border-box'
+    maxWidth: '250px',
+    outline: 'none'
   },
   tableWrapper: {
     borderRadius: '8px',
@@ -83,7 +78,6 @@ const styles = {
     background: isExpanded ? '#f8fafc' : '#ffffff',
     transition: 'background 0.2s',
   }),
-  // Area Expand kembali normal agar teks tidak terpotong
   expandedArea: {
     background: '#f8fafc',
     padding: '0 16px 16px 16px',
@@ -129,36 +123,45 @@ const styles = {
     transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
     color: '#94a3b8',
     fontSize: '10px',
-    marginRight: '8px' // Panah berdampingan dengan Nomor
+    marginRight: '8px'
   }),
-  // Desain Paginasi Minimalis (Sesuai Gambar RDTC)
+  // Area Bawah (Info Data & Paginasi)
+  bottomArea: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginTop: '20px',
+    gap: '12px'
+  },
+  infoText: {
+    fontSize: '13px',
+    color: '#64748b'
+  },
   paginationContainer: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: '16px',
-    marginTop: '20px'
+    gap: '12px',
+    flexWrap: 'wrap'
   },
   iconBtn: (disabled) => ({
     background: 'transparent',
     border: 'none',
-    color: disabled ? '#cbd5e1' : '#94a3b8',
+    color: disabled ? '#cbd5e1' : '#64748b',
     cursor: disabled ? 'not-allowed' : 'pointer',
     fontSize: '14px',
     fontWeight: '600',
     padding: '4px 8px'
   }),
   pageSelect: {
-    padding: '6px 16px',
+    padding: '6px 12px',
     borderRadius: '6px',
     border: '1px solid #cbd5e1',
     background: '#ffffff',
-    fontSize: '14px',
+    fontSize: '13px',
     color: '#0f172a',
     cursor: 'pointer',
     outline: 'none',
-    appearance: 'none', // Menghilangkan gaya bawaan browser jika memungkinkan
-    textAlign: 'center'
   }
 };
 
@@ -174,14 +177,15 @@ const getMerchantStyle = (merchant) => {
 export default function DataTablesCard({ dataFood, dataQris }) {
   const [activeTab, setActiveTab] = useState('food');
   const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
   const [expandedRow, setExpandedRow] = useState(null);
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10); 
 
   useEffect(() => {
     setCurrentPage(1);
     setExpandedRow(null);
-  }, [activeTab, searchTerm]);
+  }, [activeTab, searchTerm, itemsPerPage]);
 
   const toggleRow = (id) => {
     setExpandedRow(expandedRow === id ? null : id);
@@ -219,11 +223,7 @@ export default function DataTablesCard({ dataFood, dataQris }) {
         </button>
       </div>
 
-      {/* STRUKTUR PENCARIAN BARU */}
       <div style={styles.toolbarWrapper}>
-        <div style={styles.infoText}>
-          Menampilkan <b>{paginatedData.length > 0 ? startNumber + 1 : 0} - {startNumber + paginatedData.length}</b> dari <b>{activeData.length}</b> data
-        </div>
         <input 
           type="text" 
           placeholder="Cari data..." 
@@ -361,9 +361,23 @@ export default function DataTablesCard({ dataFood, dataQris }) {
         </table>
       </div>
 
-      {/* STRUKTUR PAGINASI BARU */}
-      {totalPages > 1 && (
+      <div style={styles.bottomArea}>
+        <div style={styles.infoText}>
+          Menampilkan <b>{paginatedData.length > 0 ? startNumber + 1 : 0} - {startNumber + paginatedData.length}</b> dari <b>{activeData.length}</b> data
+        </div>
+
         <div style={styles.paginationContainer}>
+          <select 
+            style={styles.pageSelect} 
+            value={itemsPerPage} 
+            onChange={(e) => setItemsPerPage(Number(e.target.value))}
+          >
+            <option value={5}>5 Baris</option>
+            <option value={10}>10 Baris</option>
+            <option value={20}>20 Baris</option>
+            <option value={50}>50 Baris</option>
+          </select>
+
           <button 
             style={styles.iconBtn(currentPage === 1)} 
             onClick={() => setCurrentPage(1)} 
@@ -379,32 +393,27 @@ export default function DataTablesCard({ dataFood, dataQris }) {
             &lt;
           </button>
           
-          <select 
-            value={currentPage} 
-            onChange={(e) => setCurrentPage(Number(e.target.value))}
-            style={styles.pageSelect}
-          >
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-              <option key={p} value={p}>{p}</option>
-            ))}
-          </select>
-
+          <span style={{ fontSize: '13px', color: '#64748b' }}>
+            Hal {currentPage} / {totalPages || 1}
+          </span>
+          
           <button 
-            style={styles.iconBtn(currentPage === totalPages)} 
-            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} 
-            disabled={currentPage === totalPages}
+            style={styles.iconBtn(currentPage === totalPages || totalPages === 0)} 
+            onClick={() => setCurrentPage(p => Math.min(totalPages || 1, p + 1))} 
+            disabled={currentPage === totalPages || totalPages === 0}
           >
             &gt;
           </button>
           <button 
-            style={styles.iconBtn(currentPage === totalPages)} 
-            onClick={() => setCurrentPage(totalPages)} 
-            disabled={currentPage === totalPages}
+            style={styles.iconBtn(currentPage === totalPages || totalPages === 0)} 
+            onClick={() => setCurrentPage(totalPages || 1)} 
+            disabled={currentPage === totalPages || totalPages === 0}
           >
             &gt;|
           </button>
         </div>
-      )}
+      </div>
+
     </div>
   );
 }
