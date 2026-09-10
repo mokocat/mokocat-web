@@ -1,32 +1,52 @@
-import { useEffect, useState } from 'react'
-// Mengimpor komponen balok Lego yang baru kita buat
-import TabelFood from './components/TabelFood' 
+import { useEffect, useState } from 'react';
+import TabelFood from './components/TabelFood';
+import TabelQris from './components/TabelQris';
 
-function App() {
-  const [dataFood, setDataFood] = useState([])
-  const [dataQris, setDataQris] = useState([]) // Siap untuk menampung data QRIS nanti
+const styles = {
+  container: {
+    padding: '30px',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    background: '#f8f9fa',
+    minHeight: '100vh'
+  },
+  headerTitle: {
+    fontSize: '24px',
+    color: '#0f172a',
+    margin: '0 0 20px 0'
+  },
+  // Kunci layout Grid 2 kolom
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+    gap: '24px',
+    alignItems: 'start' // Mencegah kartu memanjang otomatis jika isi tabel berbeda
+  }
+};
+
+export default function App() {
+  const [dataFood, setDataFood] = useState([]);
+  const [dataQris, setDataQris] = useState([]);
 
   useEffect(() => {
-    fetch('https://mokocat.app/api.php')
+    fetch('https://domainkamu.com/api_food.php')
       .then(res => res.json())
       .then(result => {
         if (result.status === 'success') {
-          setDataFood(result.data_food)
-          setDataQris(result.data_qris)
+          setDataFood(result.data_food);
+          setDataQris(result.data_qris);
         }
-      })
-  }, [])
+      });
+  }, []);
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-      <h2>Dasbor MokoCat</h2>
+    <div style={styles.container}>
+      <h1 style={styles.headerTitle}>Dashboard Pendapatan</h1>
       
-      <h3>Riwayat Penjualan Makanan</h3>
-      {/* Memanggil komponen dan mengirimkan isi dataFood ke dalamnya */}
-      <TabelFood data={dataFood} />
+      <div style={styles.grid}>
+        <TabelFood data={dataFood} />
+        <TabelQris data={dataQris} />
+      </div>
       
     </div>
-  )
+  );
 }
-
-export default App
