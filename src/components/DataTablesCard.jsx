@@ -10,12 +10,13 @@ const styles = {
   },
   tabContainer: {
     display: 'flex',
+    justifyContent: 'center', // Membuat tab menu rata tengah
     borderBottom: '2px solid #f1f5f9',
     marginBottom: '24px',
     gap: '24px'
   },
   tabBtn: (isActive) => ({
-    padding: '10px 4px',
+    padding: '10px 16px',
     cursor: 'pointer',
     background: 'transparent',
     border: 'none',
@@ -53,7 +54,7 @@ const styles = {
   table: {
     width: '100%',
     borderCollapse: 'collapse',
-    textAlign: 'left',
+    textAlign: 'center', // Mengubah rata kiri menjadi rata tengah untuk keseluruhan tabel
     whiteSpace: 'nowrap'
   },
   th: {
@@ -63,15 +64,16 @@ const styles = {
     fontSize: '13px',
     fontWeight: '700',
     textTransform: 'uppercase',
-    letterSpacing: '0.5px'
+    letterSpacing: '0.5px',
+    textAlign: 'center' // Memastikan judul kolom rata tengah
   },
   td: {
     padding: '16px',
     fontSize: '14px',
     color: '#334155',
-    borderBottom: '1px solid #f1f5f9'
+    borderBottom: '1px solid #f1f5f9',
+    textAlign: 'center' // Memastikan isi baris rata tengah
   },
-  // Gaya dasar untuk semua tipe label/badge
   badgeBase: {
     padding: '6px 12px',
     borderRadius: '20px',
@@ -82,12 +84,11 @@ const styles = {
   },
   pagination: {
     display: 'flex',
-    justifyContent: 'flex-end', // Meratakan tombol angka ke kanan
+    justifyContent: 'center', // Mengubah flex-end (kanan) menjadi center (tengah)
     alignItems: 'center',
     marginTop: '20px',
     gap: '8px'
   },
-  // Tombol angka paginasi berbentuk kotak membulat
   pageNumberBtn: (isActive) => ({
     width: '36px',
     height: '36px',
@@ -104,17 +105,16 @@ const styles = {
   })
 };
 
-// Fungsi cerdas untuk menentukan warna berdasarkan nama merchant
 const getMerchantStyle = (merchant) => {
   switch (merchant) {
     case 'ShopeeFood': 
-      return { bg: '#ffedd5', color: '#ea580c' }; // Orange
+      return { bg: '#ffedd5', color: '#ea580c' }; 
     case 'GoFood': 
-      return { bg: '#fee2e2', color: '#dc2626' }; // Merah
+      return { bg: '#fee2e2', color: '#dc2626' }; 
     case 'GrabFood': 
-      return { bg: '#dcfce3', color: '#16a34a' }; // Hijau
+      return { bg: '#dcfce3', color: '#16a34a' }; 
     default: 
-      return { bg: '#f1f5f9', color: '#475569' }; // Abu-abu (opsi aman)
+      return { bg: '#f1f5f9', color: '#475569' }; 
   }
 };
 
@@ -148,7 +148,6 @@ export default function DataTablesCard({ dataFood, dataQris }) {
     currentPage * itemsPerPage
   );
 
-  // Menghitung nomor urut agar tetap berlanjut di halaman 2, 3, dst.
   const startNumber = (currentPage - 1) * itemsPerPage;
 
   return (
@@ -209,7 +208,6 @@ export default function DataTablesCard({ dataFood, dataQris }) {
               <tr key={item.id} style={{ background: index % 2 === 0 ? '#ffffff' : '#f8fafc' }}>
                 <td style={styles.td}>{startNumber + index + 1}</td>
                 
-                {/* Logika Kolom Tabel Makanan (trx_food) */}
                 {activeTab === 'food' ? (
                   <>
                     <td style={styles.td}>{item.tanggal_order}</td>
@@ -231,7 +229,6 @@ export default function DataTablesCard({ dataFood, dataQris }) {
                     <td style={styles.td}>
                       <span style={{
                         ...styles.badgeBase,
-                        // Jika statusnya Transferred, warnanya beda dengan Pending/Checked
                         background: item.status === 'Transferred' ? '#f0fdf4' : '#f8fafc',
                         color: item.status === 'Transferred' ? '#15803d' : '#64748b',
                         border: '1px solid #e2e8f0'
@@ -241,7 +238,6 @@ export default function DataTablesCard({ dataFood, dataQris }) {
                     </td>
                   </>
                 ) : (
-                /* Logika Kolom Tabel QRIS (trx_qris) */
                   <>
                     <td style={styles.td}>{item.tanggal}</td>
                     <td style={styles.td}>
@@ -271,7 +267,6 @@ export default function DataTablesCard({ dataFood, dataQris }) {
         </table>
       </div>
 
-      {/* Area Kontrol Paginasi dengan Nomor */}
       {totalPages > 1 && (
         <div style={styles.pagination}>
           {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
