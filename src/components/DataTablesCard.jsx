@@ -40,11 +40,13 @@ const getStyles = (d) => {
     info: { fontSize: '13px', color: c.muted },
     pag: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px' },
     nav: (ds) => ({ background: 'transparent', border: 'none', color: ds ? (d ? '#475569' : '#cbd5e1') : c.muted, cursor: ds ? 'default' : 'pointer', fontSize: '14px', fontWeight: '600', padding: '4px 8px', transition: 'color 0.2s' }),
-    sel: { padding: '4px 12px', borderRadius: '6px', border: `1px solid ${c.primary}`, background: c.input, fontSize: '13px', fontWeight: '500', color: c.text, outline: 'none', textAlign: 'center' }
+    sel: { padding: '4px 12px', borderRadius: '6px', border: `1px solid ${c.primary}`, background: c.input, fontSize: '13px', fontWeight: '500', color: c.text, outline: 'none', textAlign: 'center' },
+    loader: { display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 0', color: c.muted },
+    spinner: { width: '28px', height: '28px', border: `3px solid ${c.border}`, borderTopColor: c.primary, borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: '12px' }
   };
 };
 
-export default function DataTablesCard({ dataFood, dataQris, isDarkMode }) {
+export default function DataTablesCard({ dataFood, dataQris, isDarkMode, isLoading }) {
   const s = getStyles(isDarkMode);
   const [tab, setTab] = useState('food');
   const [search, setSearch] = useState('');
@@ -54,20 +56,23 @@ export default function DataTablesCard({ dataFood, dataQris, isDarkMode }) {
 
   useEffect(() => { setPage(1); setExp(null); }, [tab, search, limit]);
 
-  const data = (tab === 'food' ? dataFood : dataQris).filter(i => 
-    (i.merchant || i.tipe)?.toLowerCase().includes(search.toLowerCase()) || 
-    (i.tanggal_order || i.tanggal)?.includes(search) || 
-    i.status?.toLowerCase().includes(search.toLowerCase())
-  );
+  const data = (tab === 'food' ? dataFood : dataQris).filter(i => {
+    const t1 = String(i.merchant || i.tipe || '').toLowerCase();
+    const t2 = String(i.tanggal_order || i.tanggal || '').toLowerCase();
+    const t3 = String(i.status || '').toLowerCase();
+    const q = search.toLowerCase();
+    return t1.includes(q) || t2.includes(q) || t3.includes(q);
+  });
 
   const total = Math.ceil(data.length / limit);
   const sliced = data.slice((page - 1) * limit, page * limit);
   const start = (page - 1) * limit;
 
-  const f = (n) => `Rp ${parseInt(n).toLocaleString('id-ID')}`;
+  const f = (n) => `Rp ${parseInt(n || 0).toLocaleString('id-ID')}`;
 
   return (
     <div style={s.card}>
+      <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
       <div style={s.tabs}>
         <button style={s.btn(tab === 'food')} onClick={() => setTab('food')}>🍔 Penjualan Makanan</button>
         <button style={s.btn(tab === 'qris')} onClick={() => setTab('qris')}>📱 Transaksi QRIS</button>
@@ -85,7 +90,16 @@ export default function DataTablesCard({ dataFood, dataQris, isDarkMode }) {
             )}
           </thead>
           <tbody>
-            {sliced.length > 0 ? sliced.map((i, idx) => {
+            {isLoading ? (
+              <tr>
+                <td colSpan="5">
+                  <div style={s.loader}>
+                    <div style={s.spinner} />
+                    <div style={{ fontSize: '14px', fontWeight: '500' }}>Memuat data transaksi...</div>
+                  </div>
+                </td>
+              </tr>
+            ) : sliced.length > 0 ? sliced.map((i, idx) => {
               const isExp = exp === i.id;
               return (
                 <React.Fragment key={i.id}>
@@ -115,22 +129,22 @@ export default function DataTablesCard({ dataFood, dataQris, isDarkMode }) {
                               <div style={s.recTitle}>{tab === 'food' ? 'Rincian Transaksi' : 'Rincian QRIS'}</div>
                               {tab === 'food' ? (
                                 <>
-                                  <div style={s.recItem}><span style={{color: s.muted.color}}>Pendapatan Kotor</span><span>{f(i.pendapatan_kotor)}</span></div>
-                                  <div style={s.recItem}><span style={{color: s.muted.color}}>Potongan Warung</span><span>{f(i.pendapatan_warung)}</span></div>
-                                  <div style={s.recItem}><span style={{color: s.muted.color}}>Promo Diskon</span><span>{f(i.promo_diskon)}</span></div>
-                                  <div style={s.recItem}><span style={{color: s.muted.color}}>Promo Ongkir</span><span>{f(i.promo_ongkir)}</span></div>
+                                  <div style={s.recItem}><span style={{color: s.muted}}>Pendapatan Kotor</span><span>{f(i.pendapatan_kotor)}</span></div>
+                                  <div style={s.recItem}><span style={{color: s.muted}}>Potongan Warung</span><span>{f(i.pendapatan_warung)}</span></div>
+                                  <div style={s.recItem}><span style={{color: s.muted}}>Promo Diskon</span><span>{f(i.promo_diskon)}</span></div>
+                                  <div style={s.recItem}><span style={{color: s.muted}}>Promo Ongkir</span><span>{f(i.promo_ongkir)}</span></div>
                                   <div style={s.recDash}>
-                                    <span style={{color: s.muted.color}}>Plus / Minus</span>
-                                    <span style={{color: parseInt(i.plus_minus) < 0 ? (isDarkMode ? '#f87171' : '#ef4444') : (isDarkMode ? '#34d399' : '#10b981')}}>
-                                      {parseInt(i.plus_minus) > 0 ? '+' : ''}{f(i.plus_minus)}
+                                    <span style={{color: s.muted}}>Plus / Minus</span>
+                                    <span style={{color: parseInt(i.plus_minus || 0) < 0 ? (isDarkMode ? '#f87171' : '#ef4444') : (isDarkMode ? '#34d399' : '#10b981')}}>
+                                      {parseInt(i.plus_minus || 0) > 0 ? '+' : ''}{f(i.plus_minus)}
                                     </span>
                                   </div>
                                 </>
                               ) : (
                                 <>
-                                  <div style={s.recItem}><span style={{color: s.muted.color}}>Tanggal Transaksi</span><span>{i.tanggal}</span></div>
+                                  <div style={s.recItem}><span style={{color: s.muted}}>Tanggal Transaksi</span><span>{i.tanggal}</span></div>
                                   <div style={s.recDash}>
-                                    <span style={{color: s.muted.color}}>Total Masuk</span>
+                                    <span style={{color: s.muted}}>Total Masuk</span>
                                     <span style={{color: isDarkMode ? '#34d399' : '#10b981'}}>{f(i.nominal)}</span>
                                   </div>
                                 </>
