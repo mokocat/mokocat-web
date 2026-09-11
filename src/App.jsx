@@ -17,12 +17,13 @@ export default function App() {
   }, []);
 
   return (
-    <div style={{ padding: '30px', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', background: '#f8f9fa', minHeight: '100vh' }}>
-      <h1 style={{ fontSize: '24px', color: '#0f172a', marginBottom: '24px' }}>Dashboard MokoCat</h1>
-      
-      {/* Cukup lempar kedua data ke dalam 1 komponen card */}
-      <DataTablesCard dataFood={dataFood} dataQris={dataQris} />
-      
-    </div>
-  );
+  <div style={{ 
+      padding: '30px', 
+      minHeight: '100vh',
+      // Jika dark mode terdeteksi, warnai bg jadi hitam slate (#0f172a)
+      background: window.matchMedia('(prefers-color-scheme: dark)').matches ? '#0f172a' : '#f8f9fa' 
+  }}>
+    <DataTablesCard dataFood={dataFood} dataQris={dataQris} />
+  </div>
+);
 }
