@@ -1,196 +1,236 @@
 import React, { useState, useEffect } from 'react';
 
-const styles = {
-  card: {
-    background: '#ffffff',
-    borderRadius: '12px',
-    padding: '20px',
-    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
-    border: '1px solid #e2e8f0',
-  },
-  tabContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    borderBottom: '1px solid #e2e8f0',
-    marginBottom: '16px',
-    gap: '24px'
-  },
-  tabBtn: (isActive) => ({
-    padding: '8px 12px',
-    cursor: 'pointer',
-    background: 'transparent',
-    border: 'none',
-    borderBottom: isActive ? '2px solid #2563eb' : '2px solid transparent',
-    color: isActive ? '#2563eb' : '#64748b',
-    fontWeight: isActive ? '600' : '500',
-    fontSize: '14px',
-    transition: 'all 0.2s',
-    marginBottom: '-1px'
-  }),
-  toolbarWrapper: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    marginBottom: '16px'
-  },
-  searchInput: {
-    padding: '10px 16px',
-    borderRadius: '8px',
-    background: '#ffffff',
-    color: '#0f172a',
-    border: '1px solid #cbd5e1',
-    fontSize: '14px',
-    width: '100%',
-    maxWidth: '250px',
-    outline: 'none'
-  },
-  tableWrapper: {
-    borderRadius: '8px',
-    border: '1px solid #e2e8f0',
-    overflow: 'hidden',
-    overflowX: 'auto'
-  },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-  },
-  th: (align = 'left') => ({
-    padding: '12px 16px',
-    background: '#f8fafc',
-    color: '#64748b',
-    fontSize: '12px',
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    textAlign: align,
-    borderBottom: '1px solid #e2e8f0',
-    whiteSpace: 'nowrap'
-  }),
-  td: (align = 'left') => ({
-    padding: '12px 16px',
-    fontSize: '13px',
-    color: '#334155',
-    borderBottom: '1px solid #f1f5f9',
-    textAlign: align,
-    whiteSpace: 'nowrap'
-  }),
-  trMain: (isExpanded) => ({
-    cursor: 'pointer',
-    background: isExpanded ? '#f8fafc' : '#ffffff',
-    transition: 'background 0.2s',
-  }),
-  iconRotate: (isExpanded) => ({
-    display: 'inline-block',
-    transition: 'transform 0.3s ease',
-    transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-    color: '#94a3b8',
-    fontSize: '10px',
-    marginRight: '8px'
-  }),
-  // Animasi Expand yang diperbaiki agar super mulus
-  expandAnimatedWrapper: (isExpanded) => ({
-    display: 'grid',
-    gridTemplateRows: isExpanded ? '1fr' : '0fr',
-    transition: 'grid-template-rows 0.3s ease-in-out',
-    background: '#f8fafc'
-  }),
-  expandInner: {
-    overflow: 'hidden'
-  },
-  expandedArea: {
-    padding: '0 16px 16px 16px',
-    whiteSpace: 'normal',
-    borderBottom: '1px solid #e2e8f0'
-  },
-  detailsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-    gap: '16px',
-    background: '#ffffff',
-    padding: '16px',
-    borderRadius: '8px',
-    border: '1px solid #e2e8f0',
-    textAlign: 'left'
-  },
-  detailItem: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '4px'
-  },
-  detailLabel: {
-    fontSize: '11px',
-    color: '#64748b',
-    fontWeight: '600',
-    textTransform: 'uppercase'
-  },
-  detailValue: {
-    fontSize: '13px',
-    color: '#0f172a',
-    fontWeight: '500'
-  },
-  badgeBase: {
-    padding: '4px 10px',
-    borderRadius: '12px',
-    fontSize: '12px',
-    fontWeight: '600',
-    display: 'inline-block'
-  },
-  // Desain Paginasi Persis Lampiran Gambar
-  bottomArea: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginTop: '20px',
-    gap: '12px'
-  },
-  infoText: {
-    fontSize: '13px',
-    color: '#64748b'
-  },
-  paginationContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: '12px',
-  },
-  iconBtn: (disabled) => ({
-    background: 'transparent',
-    border: 'none',
-    color: disabled ? '#cbd5e1' : '#94a3b8',
-    cursor: disabled ? 'default' : 'pointer',
-    fontSize: '14px',
-    fontWeight: '600',
-    padding: '4px 8px',
-    transition: 'color 0.2s'
-  }),
-  pageSelect: {
-    padding: '4px 12px',
-    borderRadius: '6px',
-    border: '1px solid #3b82f6', // Border biru menyesuaikan gambar
-    background: '#ffffff',
-    fontSize: '13px',
-    fontWeight: '500',
-    color: '#0f172a',
-    cursor: 'pointer',
-    outline: 'none',
-    textAlign: 'center'
+// Fungsi penentu warna Merchant dinamis untuk Light/Dark mode
+const getMerchantStyle = (merchant, isDark) => {
+  switch (merchant) {
+    case 'ShopeeFood': 
+      return { bg: isDark ? '#7c2d12' : '#ffedd5', color: isDark ? '#fdba74' : '#ea580c' }; 
+    case 'GoFood': 
+      return { bg: isDark ? '#7f1d1d' : '#fee2e2', color: isDark ? '#fca5a5' : '#dc2626' }; 
+    case 'GrabFood': 
+      return { bg: isDark ? '#14532d' : '#dcfce3', color: isDark ? '#86efac' : '#16a34a' }; 
+    default: 
+      return { bg: isDark ? '#334155' : '#f1f5f9', color: isDark ? '#cbd5e1' : '#475569' }; 
   }
 };
 
-const getMerchantStyle = (merchant) => {
-  switch (merchant) {
-    case 'ShopeeFood': return { bg: '#ffedd5', color: '#ea580c' }; 
-    case 'GoFood': return { bg: '#fee2e2', color: '#dc2626' }; 
-    case 'GrabFood': return { bg: '#dcfce3', color: '#16a34a' }; 
-    default: return { bg: '#f1f5f9', color: '#475569' }; 
-  }
+// Objek gaya diubah menjadi fungsi yang menerima parameter isDark
+const getStyles = (isDark) => {
+  // Palet Warna Dinamis
+  const colors = {
+    cardBg: isDark ? '#1e293b' : '#ffffff',
+    border: isDark ? '#334155' : '#e2e8f0',
+    textMain: isDark ? '#f8fafc' : '#334155',
+    textMuted: isDark ? '#94a3b8' : '#64748b',
+    bgHover: isDark ? '#0f172a' : '#f8fafc',
+    bgHeader: isDark ? '#0f172a' : '#f8fafc',
+    inputBg: isDark ? '#0f172a' : '#ffffff',
+    primary: isDark ? '#60a5fa' : '#2563eb'
+  };
+
+  return {
+    card: {
+      background: colors.cardBg,
+      borderRadius: '12px',
+      padding: '20px',
+      boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 6px -1px rgba(0,0,0,0.05)',
+      border: `1px solid ${colors.border}`,
+      transition: 'background-color 0.3s, border-color 0.3s' // Transisi halus saat ganti tema
+    },
+    tabContainer: {
+      display: 'flex',
+      justifyContent: 'center',
+      borderBottom: `1px solid ${colors.border}`,
+      marginBottom: '16px',
+      gap: '24px'
+    },
+    tabBtn: (isActive) => ({
+      padding: '8px 12px',
+      cursor: 'pointer',
+      background: 'transparent',
+      border: 'none',
+      borderBottom: isActive ? `2px solid ${colors.primary}` : '2px solid transparent',
+      color: isActive ? colors.primary : colors.textMuted,
+      fontWeight: isActive ? '600' : '500',
+      fontSize: '14px',
+      transition: 'all 0.2s',
+      marginBottom: '-1px'
+    }),
+    toolbarWrapper: {
+      display: 'flex',
+      justifyContent: 'flex-end',
+      marginBottom: '16px'
+    },
+    searchInput: {
+      padding: '10px 16px',
+      borderRadius: '8px',
+      background: colors.inputBg,
+      color: colors.textMain,
+      border: `1px solid ${colors.border}`,
+      fontSize: '14px',
+      width: '100%',
+      maxWidth: '250px',
+      outline: 'none',
+      transition: 'all 0.3s'
+    },
+    tableWrapper: {
+      borderRadius: '8px',
+      border: `1px solid ${colors.border}`,
+      overflow: 'hidden',
+      overflowX: 'auto'
+    },
+    table: {
+      width: '100%',
+      borderCollapse: 'collapse',
+    },
+    th: (align = 'left') => ({
+      padding: '12px 16px',
+      background: colors.bgHeader,
+      color: colors.textMuted,
+      fontSize: '12px',
+      fontWeight: '700',
+      textTransform: 'uppercase',
+      textAlign: align,
+      borderBottom: `1px solid ${colors.border}`,
+      whiteSpace: 'nowrap',
+      transition: 'background-color 0.3s'
+    }),
+    td: (align = 'left') => ({
+      padding: '12px 16px',
+      fontSize: '13px',
+      color: colors.textMain,
+      borderBottom: `1px solid ${colors.border}`,
+      textAlign: align,
+      whiteSpace: 'nowrap',
+      transition: 'color 0.3s'
+    }),
+    trMain: (isExpanded) => ({
+      cursor: 'pointer',
+      background: isExpanded ? colors.bgHover : 'transparent',
+      transition: 'background-color 0.2s',
+    }),
+    iconRotate: (isExpanded) => ({
+      display: 'inline-block',
+      transition: 'transform 0.3s ease',
+      transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+      color: colors.textMuted,
+      fontSize: '10px',
+      marginRight: '8px'
+    }),
+    expandAnimatedWrapper: (isExpanded) => ({
+      display: 'grid',
+      gridTemplateRows: isExpanded ? '1fr' : '0fr',
+      transition: 'grid-template-rows 0.3s ease-in-out',
+      background: colors.bgHover
+    }),
+    expandInner: {
+      overflow: 'hidden'
+    },
+    expandedArea: {
+      padding: '0 16px 16px 16px',
+      whiteSpace: 'normal',
+      borderBottom: `1px solid ${colors.border}`
+    },
+    detailsGrid: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+      gap: '16px',
+      background: colors.cardBg,
+      padding: '16px',
+      borderRadius: '8px',
+      border: `1px solid ${colors.border}`,
+      textAlign: 'left',
+      transition: 'background-color 0.3s'
+    },
+    detailItem: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '4px'
+    },
+    detailLabel: {
+      fontSize: '11px',
+      color: colors.textMuted,
+      fontWeight: '600',
+      textTransform: 'uppercase'
+    },
+    detailValue: {
+      fontSize: '13px',
+      color: colors.textMain,
+      fontWeight: '500'
+    },
+    badgeBase: {
+      padding: '4px 10px',
+      borderRadius: '12px',
+      fontSize: '12px',
+      fontWeight: '600',
+      display: 'inline-block'
+    },
+    bottomArea: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      marginTop: '20px',
+      gap: '12px'
+    },
+    infoText: {
+      fontSize: '13px',
+      color: colors.textMuted
+    },
+    paginationContainer: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: '12px',
+    },
+    iconBtn: (disabled) => ({
+      background: 'transparent',
+      border: 'none',
+      color: disabled ? (isDark ? '#475569' : '#cbd5e1') : colors.textMuted,
+      cursor: disabled ? 'default' : 'pointer',
+      fontSize: '14px',
+      fontWeight: '600',
+      padding: '4px 8px',
+      transition: 'color 0.2s'
+    }),
+    pageSelect: {
+      padding: '4px 12px',
+      borderRadius: '6px',
+      border: `1px solid ${colors.primary}`,
+      background: colors.inputBg,
+      fontSize: '13px',
+      fontWeight: '500',
+      color: colors.textMain,
+      cursor: 'pointer',
+      outline: 'none',
+      textAlign: 'center'
+    }
+  };
 };
 
 export default function DataTablesCard({ dataFood, dataQris }) {
+  // === STATE UNTUK DARK MODE SENSOR ===
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    // Mengecek preferensi tema pada sistem/browser saat pertama kali dimuat
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    setIsDarkMode(mediaQuery.matches);
+
+    // Mendengarkan perubahan tema secara live (jika user mengubah tema HP)
+    const handler = (e) => setIsDarkMode(e.matches);
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+
+  // Memanggil fungsi styles dengan membawa status dark mode
+  const styles = getStyles(isDarkMode);
+
   const [activeTab, setActiveTab] = useState('food');
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedRow, setExpandedRow] = useState(null);
   
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5); // Default 5 sesuai gambar
+  const [itemsPerPage, setItemsPerPage] = useState(5); 
 
   useEffect(() => {
     setCurrentPage(1);
@@ -279,7 +319,7 @@ export default function DataTablesCard({ dataFood, dataQris }) {
                       <>
                         <td style={styles.td('center')}>{item.tanggal_order}</td>
                         <td style={styles.td('center')}>
-                          <span style={{ ...styles.badgeBase, background: getMerchantStyle(item.merchant).bg, color: getMerchantStyle(item.merchant).color }}>
+                          <span style={{ ...styles.badgeBase, background: getMerchantStyle(item.merchant, isDarkMode).bg, color: getMerchantStyle(item.merchant, isDarkMode).color }}>
                             {item.merchant}
                           </span>
                         </td>
@@ -289,8 +329,8 @@ export default function DataTablesCard({ dataFood, dataQris }) {
                         <td style={styles.td('center')}>
                           <span style={{
                             ...styles.badgeBase,
-                            background: item.status === 'Transferred' ? '#dcfce3' : '#f1f5f9',
-                            color: item.status === 'Transferred' ? '#16a34a' : '#64748b',
+                            background: item.status === 'Transferred' ? (isDarkMode ? '#14532d' : '#dcfce3') : (isDarkMode ? '#334155' : '#f1f5f9'),
+                            color: item.status === 'Transferred' ? (isDarkMode ? '#86efac' : '#16a34a') : (isDarkMode ? '#cbd5e1' : '#64748b'),
                           }}>
                             {item.status}
                           </span>
@@ -300,7 +340,7 @@ export default function DataTablesCard({ dataFood, dataQris }) {
                       <>
                         <td style={styles.td('center')}>{item.tanggal}</td>
                         <td style={styles.td('center')}>
-                          <span style={{ ...styles.badgeBase, background: '#ecfdf5', color: '#059669' }}>
+                          <span style={{ ...styles.badgeBase, background: isDarkMode ? '#14532d' : '#ecfdf5', color: isDarkMode ? '#6ee7b7' : '#059669' }}>
                             {item.tipe}
                           </span>
                         </td>
@@ -311,7 +351,6 @@ export default function DataTablesCard({ dataFood, dataQris }) {
                     )}
                   </tr>
 
-                  {/* BARIS DETAIL DENGAN ANIMASI GRID (SUPER MULUS) */}
                   <tr>
                     <td colSpan={activeTab === 'food' ? "5" : "4"} style={{ padding: 0, border: 'none' }}>
                       <div style={styles.expandAnimatedWrapper(isExpanded)}>
@@ -338,7 +377,7 @@ export default function DataTablesCard({ dataFood, dataQris }) {
                                   </div>
                                   <div style={styles.detailItem}>
                                     <span style={styles.detailLabel}>Plus/Minus</span>
-                                    <span style={{...styles.detailValue, color: parseInt(item.plus_minus) < 0 ? '#ef4444' : '#10b981'}}>
+                                    <span style={{...styles.detailValue, color: parseInt(item.plus_minus) < 0 ? (isDarkMode ? '#f87171' : '#ef4444') : (isDarkMode ? '#34d399' : '#10b981')}}>
                                       Rp {parseInt(item.plus_minus).toLocaleString('id-ID')}
                                     </span>
                                   </div>
@@ -374,7 +413,6 @@ export default function DataTablesCard({ dataFood, dataQris }) {
         </table>
       </div>
 
-      {/* AREA PAGINASI BAWAH (PERSIS GAMBAR) */}
       <div style={styles.bottomArea}>
         <div style={styles.infoText}>
           Menampilkan <b>{paginatedData.length > 0 ? startNumber + 1 : 0} - {startNumber + paginatedData.length}</b> dari <b>{activeData.length}</b> data
@@ -396,7 +434,6 @@ export default function DataTablesCard({ dataFood, dataQris }) {
             &lt;
           </button>
           
-          {/* Dropdown pemilih JUMLAH DATA di tengah panah navigasi */}
           <select 
             style={styles.pageSelect} 
             value={itemsPerPage} 
