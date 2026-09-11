@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import DataTablesCard from './components/DataTablesCard';
-import SummaryCards from './components/SummaryCards';
+import SummaryCard from './components/SummaryCard';
 
 export default function App() {
   const [dataFood, setDataFood] = useState([]);
