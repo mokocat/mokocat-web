@@ -80,14 +80,13 @@ export default function DataTable({ dataFood, dataQris, isLoading }) {
               if (plusMinus > 0) {
                 insightUntungRugi = <span>Transaksi ini memberikan keuntungan sebesar <span className="text-success">{f(plusMinus)}</span>. </span>;
               } else if (plusMinus < 0) {
-                // Gunakan Math.abs agar tanda minus (-) tidak ikut tercetak dua kali
                 insightUntungRugi = <span>Transaksi ini mengalami kerugian sebesar <span className="text-danger">{f(Math.abs(plusMinus))}</span>. </span>;
-              } // Jika 0, variabel tetap null (tidak tercetak)
+              }
 
               let insightStatus = "";
-              if (i.status === 'Pending') insightStatus = <span>Keuangan dari transaksi ini <b>masih menunggu validasi</b>.</span>;
-              else if (i.status === 'Checked') insightStatus = <span>Keuangan dari transaksi ini <b>telah divalidasi</b>.</span>;
-              else if (i.status === 'Transferred') insightStatus = <span>Keuangan dari transaksi ini <b>telah ditransfer</b>.</span>;
+              if (i.status === 'Pending') insightStatus = <span>Keuangan dari transaksi ini <span className="text-danger">menunggu validasi</span>.</span>;
+              else if (i.status === 'Checked') insightStatus = <span>Keuangan dari transaksi ini <span className="text-primary">telah divalidasi</span>.</span>;
+              else if (i.status === 'Transferred') insightStatus = <span>Keuangan dari transaksi ini <span className="text-success">telah ditransfer</span>.</span>;
               else insightStatus = <span>Keuangan dari transaksi ini berstatus <b>{i.status}</b>.</span>;
 
               return (
@@ -161,7 +160,6 @@ export default function DataTable({ dataFood, dataQris, isLoading }) {
                                   <div className="insight-box">
                                     <Info size={16} className="insight-icon" />
                                     <div>
-                                      <b>Catatan: </b><br/>
                                       {insightUntungRugi}
                                       {insightStatus}
                                     </div>
@@ -179,8 +177,10 @@ export default function DataTable({ dataFood, dataQris, isLoading }) {
 
                               {/* FOOTER WAKTU */}
                               <div className="receipt-footer">
-                                <Clock size={12} style={{flexShrink: 0}} />
-                                <span>Data dicatat oleh <b>{i.diinput_oleh}</b> pada {i.waktu_dibuat}.</span>
+                                <Clock size={12} style={{flexShrink: 0, marginTop: '3px'}} />
+                                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px' }}>
+                                  Dicatat oleh <span className="footer-badge">{i.diinput_oleh}</span> pada <span className="footer-badge">{i.waktu_dibuat}</span>
+                                </div>
                               </div>
 
                             </div>
