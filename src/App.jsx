@@ -40,7 +40,7 @@ export default function App() {
     <div style={{ padding: '20px', fontFamily: 'sans-serif', color: isDarkMode ? '#f8fafc' : '#0f172a', transition: 'color 0.3s' }}>
       <h2 style={{ textAlign: 'center', marginBottom: '24px' }}>Dasbor MokoCat</h2>
       
-      <SummaryCards dataFood={dataFood} dataQris={dataQris} isDarkMode={isDarkMode} />
+      <SummaryCard dataFood={dataFood} dataQris={dataQris} isDarkMode={isDarkMode} />
       
       <DataTablesCard dataFood={dataFood} dataQris={dataQris} isDarkMode={isDarkMode} isLoading={isLoading} />
     </div>
