@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import DataTablesCard from './components/DataTablesCard';
+import SummaryCards from './components/SummaryCards';
 
 export default function App() {
   const [dataFood, setDataFood] = useState([]);
@@ -38,6 +39,9 @@ export default function App() {
   return (
     <div style={{ padding: '20px', fontFamily: 'sans-serif', color: isDarkMode ? '#f8fafc' : '#0f172a', transition: 'color 0.3s' }}>
       <h2 style={{ textAlign: 'center', marginBottom: '24px' }}>Dasbor MokoCat</h2>
+      
+      <SummaryCards dataFood={dataFood} dataQris={dataQris} isDarkMode={isDarkMode} />
+      
       <DataTablesCard dataFood={dataFood} dataQris={dataQris} isDarkMode={isDarkMode} isLoading={isLoading} />
     </div>
   );
