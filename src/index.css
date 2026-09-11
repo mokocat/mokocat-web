@@ -71,12 +71,9 @@ body {
 .expand-wrapper { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s ease-in-out; }
 .expand-wrapper.open { grid-template-rows: 1fr; }
 .expand-inner { overflow: hidden; }
-
-/* FIX 1: white-space: normal ditambahkan agar teks bisa turun ke baris baru */
 .expand-area { padding: 16px 12px; background: var(--bg-hover); border-bottom: 1px solid var(--border); white-space: normal; }
 
-/* FIX 2: max-width dikurangi & box-sizing ditambahkan agar jarak nominal lebih rapat */
-.receipt { width: 100%; max-width: 290px; margin: 0 auto; background: var(--bg-card); padding: 20px 16px; border-radius: 12px; border: 1px dashed var(--border); box-shadow: var(--receipt-shadow); box-sizing: border-box; }
+.receipt { text-align: left; width: 100%; max-width: 290px; margin: 0 auto; background: var(--bg-card); padding: 20px 16px; border-radius: 12px; border: 1px dashed var(--border); box-shadow: var(--receipt-shadow); box-sizing: border-box; }
 
 .receipt-header { display: flex; justify-content: center; gap: 8px; margin-bottom: 24px; }
 .receipt-section { margin-bottom: 16px; }
@@ -86,13 +83,12 @@ body {
 
 .receipt-dash { display: flex; justify-content: space-between; padding: 12px 0 0 0; margin-top: 8px; border-top: 2px dashed var(--border); font-size: 15px; font-weight: 800; color: var(--text-strong); }
 
-/* FIX 3: align-items flex-start & flex: 1 agar kotak catatan rapi */
 .insight-box { display: flex; gap: 12px; align-items: flex-start; background: var(--icon-bg); padding: 14px; border-radius: 8px; margin-top: 24px; font-size: 13px; line-height: 1.6; color: var(--text-normal); border: 1px solid var(--border); }
 .insight-box > div { flex: 1; }
 .insight-icon { color: var(--primary); flex-shrink: 0; margin-top: 2px; }
 
-/* Footer Waktu */
-.receipt-footer { display: flex; align-items: flex-start; gap: 6px; margin-top: 16px; font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+.receipt-footer { display: flex; align-items: flex-start; gap: 6px; margin-top: 16px; font-size: 11px; color: var(--text-muted); line-height: 1.6; }
+.footer-badge { background: var(--bg-main); border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; color: var(--text-strong); font-weight: 600; white-space: nowrap; }
 
 /* --- WARNA DINAMIS (BADGE & TEKS) --- */
 .badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; display: inline-block; }
@@ -113,6 +109,8 @@ body {
 .dark-theme .text-danger { color: #f87171; font-weight: 700; }
 .text-success { color: #10b981; font-weight: 700; }
 .dark-theme .text-success { color: #34d399; font-weight: 700; }
+.text-primary { color: #2563eb; font-weight: 700; }
+.dark-theme .text-primary { color: #60a5fa; font-weight: 700; }
 
 /* --- PAGINASI & LOADER --- */
 .bottom-area { display: flex; flex-direction: column; align-items: center; margin-top: 20px; gap: 12px; }
