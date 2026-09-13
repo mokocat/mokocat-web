@@ -66,7 +66,7 @@ export default function DataTable({ dataFood, dataQris, isLoading }) {
               <tr>
                 <td colSpan="5">
                   <div className="loader">
-                    <div className="spinner" />
+                    <Loader2 size={32} className="spinner-icon" style={{ marginBottom: '12px' }} />
                     <div>Memuat data transaksi...</div>
                   </div>
                 </td>
