@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, ChevronDown, Utensils, Smartphone, Store, Home, Info, Clock, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { Search, ChevronDown, Utensils, Smartphone, Store, Home, Info, Clock, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Loader2 } from 'lucide-react';
 
 const getMerchantClass = (merchant) => {
   const valid = ['ShopeeFood', 'GoFood', 'GrabFood'];
