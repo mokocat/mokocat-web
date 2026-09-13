@@ -44,7 +44,8 @@ export default function App() {
     <div style={{ padding: '20px' }}>
       <h2 style={{ textAlign: 'center', marginBottom: '24px' }}>Dasbor MokoCat</h2>
       
-      <StatCards dataFood={dataFood} dataQris={dataQris} />
+            {/* Kirim isLoading ke StatCards */}
+      <StatCards dataFood={dataFood} dataQris={dataQris} isLoading={isLoading} />
       
       <DataTable dataFood={dataFood} dataQris={dataQris} isLoading={isLoading} />
     </div>
