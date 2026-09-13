@@ -121,5 +121,5 @@ body {
 .page-select { padding: 4px 12px; border-radius: 6px; border: 1px solid var(--primary); background: var(--bg-input); font-size: 13px; font-weight: 500; color: var(--text-strong); outline: none; text-align: center; cursor: pointer; }
 
 .loader { display: flex; flex-direction: column; align-items: center; padding: 40px 0; color: var(--text-muted); }
-.spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 12px; }
+.spinner-icon { animation: spin 1s linear infinite; color: var(--primary); }
 @keyframes spin { 100% { transform: rotate(360deg); } }
