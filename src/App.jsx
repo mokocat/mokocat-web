@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
 import StatCards from './components/StatCards';
 import DataTable from './components/DataTable';
-import './index.css'; // Mengimpor CSS Global
+import { fetchDashboardData } from './services/api'; // Mengimpor API Service
+import './index.css'; 
 
 export default function App() {
   const [dataFood, setDataFood] = useState([]);
   const [dataQris, setDataQris] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Fungsi Manajemen Tema Gelap Otomatis
   useEffect(() => {
-    // Fungsi Manajemen Tema Gelap Otomatis
     const updateTheme = (isDark) => {
       if (isDark) document.body.classList.add('dark-theme');
       else document.body.classList.remove('dark-theme');
@@ -23,18 +24,20 @@ export default function App() {
     return () => media.removeEventListener('change', handler);
   }, []);
 
+  // Fungsi Pemanggilan API Baru (Aman & Menggunakan POST)
   useEffect(() => {
-    setIsLoading(true);
-    fetch('https://mokocat.app/api.php')
-      .then(res => res.json())
-      .then(res => {
-        if (res.status === 'success') {
-          setDataFood(res.data_food);
-          setDataQris(res.data_qris);
-        }
-      })
-      .catch(console.error)
-      .finally(() => setIsLoading(false));
+    const loadData = async () => {
+      setIsLoading(true);
+      const res = await fetchDashboardData();
+      
+      if (res && res.status === 'success') {
+        setDataFood(res.data_food);
+        setDataQris(res.data_qris);
+      }
+      setIsLoading(false);
+    };
+
+    loadData();
   }, []);
 
   return (
